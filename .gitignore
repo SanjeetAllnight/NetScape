@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 # Vitest / coverage
-coverage
+/coverage
 *.tsbuildinfo
 node_modules
