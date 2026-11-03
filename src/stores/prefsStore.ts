@@ -31,3 +31,4 @@ export const usePrefsStore = create<PrefsStoreState>((set) => ({
       },
     })),
 }));
+

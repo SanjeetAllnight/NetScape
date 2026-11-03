@@ -11,3 +11,4 @@ export const OSM_TILE_SOURCE: TileSourceConfig = {
   minZoom: 1,
   maxZoom: 19,
 };
+

@@ -167,3 +167,4 @@ npm run test         # 100% pass across all unit and integration tests
 npm run deps:check   # 0 architecture or boundary violations
 npm run build        # clean Vite production build
 ```
+

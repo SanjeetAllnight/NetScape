@@ -91,3 +91,4 @@ export class NominatimGeocodingService implements GeocodingService {
     }
   }
 }
+

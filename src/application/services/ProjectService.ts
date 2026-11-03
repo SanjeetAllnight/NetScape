@@ -490,3 +490,4 @@ export class DefaultProjectService implements ProjectService {
     usePrefsStore.getState().updatePreference(key, value);
   }
 }
+

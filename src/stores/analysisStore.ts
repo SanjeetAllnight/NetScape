@@ -106,3 +106,4 @@ export const useAnalysisStore = create<AnalysisStoreState>((set) => ({
       errors: { ...INITIAL_ERRORS },
     }),
 }));
+
