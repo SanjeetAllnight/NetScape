@@ -68,3 +68,6 @@ export class SessionManager {
   }
 }
 
+export { DefaultDesignSession } from "./session/DesignSession";
+
+

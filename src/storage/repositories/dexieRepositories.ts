@@ -285,7 +285,7 @@ export class DexieRepositories implements Repositories {
       const obstaclesById: Record<ObstacleId, Obstacle> = {};
       for (const o of obstacles) obstaclesById[o.id] = o;
 
-      const catalogItems = await this.db.deviceCatalog.where("id").anyOf(Array.from(catalogItemIds)).toArray();
+      const catalogItems = await this.db.deviceCatalog.toArray();
       const catalogById: Record<CatalogItemId, DeviceCatalogItem> = {};
       for (const cat of catalogItems) {
         catalogById[cat.id] = cat;
