@@ -96,3 +96,4 @@ export interface WorkerClient {
   cancel(requestId: string): Promise<void>;
   dispose(): void;
 }
+

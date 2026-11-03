@@ -45,3 +45,4 @@ export interface ReportModel {
   assumptions: ProjectSettings;
   disclaimers: string[];
 }
+

@@ -50,3 +50,4 @@ The following normative scripts are configured to enforce code quality, architec
 ## Phase 0 Foundation Status
 
 Phase 0 establishes the single Vite React TypeScript repository, strict typing, Tailwind CSS + shadcn conventions with locked brand colours, hash-router route skeleton, PWA precache configuration, Vitest + React Testing Library harness, dependency-boundary checks, shared contract exports, and test-only repository fake seams. Full MVP features and persistence will be implemented in Phase 1+.
+

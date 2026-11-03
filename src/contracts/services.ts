@@ -200,3 +200,4 @@ export interface AnalysisCoordinator {
     record: Extract<AnalysisRecord, { type: "coverage" }>
   ): Promise<AnalysisBlob | null>;
 }
+

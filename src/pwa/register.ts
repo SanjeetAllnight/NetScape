@@ -26,3 +26,4 @@ export function initializePwa(options?: PwaRegistrationOptions): () => void {
 
   return updateSW;
 }
+

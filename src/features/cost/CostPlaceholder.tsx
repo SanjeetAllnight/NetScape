@@ -14,3 +14,4 @@ export function CostPlaceholder() {
     </div>
   );
 }
+

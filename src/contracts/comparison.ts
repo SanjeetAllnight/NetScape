@@ -69,3 +69,4 @@ export interface DesignComparison {
     { a: "current" | "outOfDate" | "missing"; b: "current" | "outOfDate" | "missing" }
   >;
 }
+

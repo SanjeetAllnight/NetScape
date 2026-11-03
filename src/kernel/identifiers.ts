@@ -28,3 +28,4 @@ export function isValidPrefixedId(id: string, expectedPrefix: string): boolean {
   const uuidPart = id.slice(expectedPrefix.length);
   return UUID_V4_PATTERN.test(uuidPart);
 }
+

@@ -74,3 +74,4 @@ export const RF_06_VECTOR = {
     deadZone: 1,
   } as Record<SignalClass, number>,
 };
+

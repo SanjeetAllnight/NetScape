@@ -107,3 +107,4 @@ export const IP_06_VECTOR = {
     { cidr: "10.0.0.1/32" as IPv4Cidr, expectedTotal: 1, expectedUsable: 0 },
   ],
 };
+

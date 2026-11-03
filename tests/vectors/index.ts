@@ -8,3 +8,4 @@ export * from "./dijkstra.vectors";
 export * from "./rf.vectors";
 export * from "./cost.vectors";
 export * from "./simulation.vectors";
+

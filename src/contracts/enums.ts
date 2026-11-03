@@ -21,3 +21,4 @@ export type CatalogOrigin = "builtIn" | "custom";
 export type SubnetAllocationStatus = "notAllocated" | "current" | "outOfDate" | "unallocated";
 export type TopologyTemplateKind = "star" | "tree";
 export type WorkerTaskKind = "coverage.compute" | "simulation.run";
+

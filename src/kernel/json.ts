@@ -61,3 +61,4 @@ function serializeValue(val: unknown): string {
 
   throw new TypeError(`Unsupported type for canonical JSON serialization: ${typeof val}`);
 }
+

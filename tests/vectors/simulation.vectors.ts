@@ -50,3 +50,4 @@ export const SIM_06_VECTOR = {
     linkUtilizationRatio: 1.0, // 100%
   },
 };
+

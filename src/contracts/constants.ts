@@ -246,3 +246,4 @@ export const DEFAULT_PROJECT_SETTINGS: ProjectSettings = {
     queueingModel: "none",
   },
 };
+

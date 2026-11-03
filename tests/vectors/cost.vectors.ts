@@ -43,3 +43,4 @@ export const COST_01_VECTOR = {
     toleranceMoney: 0.01,
   } satisfies CostVectorExpected,
 };
+

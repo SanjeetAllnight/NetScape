@@ -80,3 +80,4 @@ export const SIM_03_VECTOR = {
     },
   ],
 };
+

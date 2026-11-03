@@ -14,3 +14,4 @@ export function MapWorkspacePlaceholder() {
     </div>
   );
 }
+
