@@ -15,8 +15,12 @@
     "check:full": "npm run check && npm run build"
   },
   "dependencies": {
+    "@turf/boolean-point-in-polygon": "^7.4.0",
+    "@turf/helpers": "^7.4.0",
     "clsx": "^2.1.1",
+    "dexie": "^4.4.7",
     "lucide-react": "^0.474.0",
+    "proj4": "^2.22.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
@@ -29,6 +33,7 @@
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/node": "^22.10.7",
+    "@types/proj4": "^2.5.6",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
@@ -50,4 +55,3 @@
     "workbox-window": "^7.3.0"
   }
 }
-
