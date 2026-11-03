@@ -19,8 +19,9 @@ import type {
   VlsmSubnetRequirement,
 } from "@/contracts/engines";
 import { resolveDevice } from "@/domain/catalog/resolveDevice";
-import { deriveLinkLengthM, geoPolygonToLocal } from "@/domain/geo/localFrame";
+import { deriveLinkLengthM, geoPolygonToLocal, checkPlanningExtent } from "@/domain/geo/localFrame";
 import { EngineInputError } from "@/contracts/errors";
+import { GEOGRAPHY_LIMITS } from "@/contracts/constants";
 
 export function buildCostEngineInput(aggregate: DesignAggregate): CostEngineInput {
   const devices = Object.values(aggregate.devicesById).map((device) => {
@@ -61,6 +62,15 @@ export function buildCostEngineInput(aggregate: DesignAggregate): CostEngineInpu
 }
 
 export function buildCoverageEngineInput(aggregate: DesignAggregate): CoverageEngineInput {
+  if (aggregate.region.boundary) {
+    const extent = checkPlanningExtent(aggregate.region.boundary, aggregate.project.frame);
+    if (!extent.ok) {
+      throw new EngineInputError(
+        `AREA_TOO_LARGE: Boundary diagonal ${extent.diagonalM}m exceeds maximum allowed ${GEOGRAPHY_LIMITS.maxPlanningExtentM}m`
+      );
+    }
+  }
+
   const boundaryM = aggregate.region.boundary
     ? geoPolygonToLocal(aggregate.region.boundary, aggregate.project.frame)
     : [];
@@ -71,6 +81,12 @@ export function buildCoverageEngineInput(aggregate: DesignAggregate): CoverageEn
       const catalogItem = aggregate.catalogById[device.catalogItemId];
       if (!catalogItem) continue;
       const resolved = resolveDevice(device, catalogItem, aggregate.project.frame);
+      const distFromOriginM = Math.hypot(resolved.positionLocalM.x, resolved.positionLocalM.y);
+      if (distFromOriginM > GEOGRAPHY_LIMITS.maxPlanningExtentM) {
+        throw new EngineInputError(
+          `AREA_TOO_LARGE: Access point '${device.id}' distance ${Math.round(distFromOriginM)}m exceeds maximum allowed ${GEOGRAPHY_LIMITS.maxPlanningExtentM}m`
+        );
+      }
       const apSpecs = resolved.specs as AccessPointSpecs;
       accessPoints.push({
         deviceId: device.id,

@@ -272,6 +272,26 @@ describe("Domain Input Builders", () => {
     expect(covInput.receiverAntennaGainDbi).toBe(0);
   });
 
+  it("guards CoverageEngineInput against APs exceeding 20km planning extent while allowing cost/simulation", () => {
+    // AP placed ~50km away from origin (12.9716, 77.5946)
+    const farAp: Device = {
+      ...devAp,
+      id: "far-ap" as DeviceId,
+      position: makeGeoPoint(78.1, 13.5),
+    };
+    const farAggregate: DesignAggregate = {
+      ...aggregate,
+      devicesById: { [farAp.id]: farAp },
+    };
+
+    // Coverage throws EngineInputError with AREA_TOO_LARGE
+    expect(() => buildCoverageEngineInput(farAggregate)).toThrow(/AREA_TOO_LARGE/);
+
+    // Other engines (cost) still build cleanly without blocking inspection
+    const cost = buildCostEngineInput(farAggregate);
+    expect(cost.devices).toHaveLength(1);
+  });
+
   it("builds SimulationEngineInput with nodes, metric edge lengths, flows, and settings", () => {
     const simInput = buildSimulationEngineInput(aggregate);
     expect(simInput.nodes).toHaveLength(2);

@@ -406,6 +406,11 @@ export function applyCommand(
     }
 
     case "link/add": {
+      const existingLinkCount = Object.keys(currentLinks).length;
+      if (existingLinkCount >= DESIGN_LIMITS.maxLinks) {
+        issues.push(errorIssue("LINK_LIMIT_EXCEEDED", `Maximum link limit (${DESIGN_LIMITS.maxLinks}) reached`, "", "link"));
+        break;
+      }
       const s = currentDevices[command.sourceDeviceId];
       const t = currentDevices[command.targetDeviceId];
       if (!s || !t) {

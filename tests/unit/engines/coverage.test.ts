@@ -15,6 +15,7 @@ import {
   RF_06_VECTOR,
 } from "../../vectors/rf.vectors";
 import { roundToDecimals } from "@/kernel/rounding";
+import { COVERAGE_DEFAULTS } from "@/contracts/constants";
 import type { Vec2, DeviceId, DesignId } from "@/contracts/primitives";
 import type { CoverageEngineInput, RunContext } from "@/contracts/engines";
 
@@ -239,6 +240,35 @@ describe("Coverage Engine (P1-04)", () => {
       };
 
       await expect(computeCoverage(input, cancelContext)).rejects.toThrow(/cancelled/i);
+    });
+
+    it("throws EngineInputError with AREA_TOO_LARGE when AP exceeds 20km extent", async () => {
+      const farInput: CoverageEngineInput = {
+        designId: "des-far" as DesignId,
+        boundaryM: [
+          [
+            { coordinateSpace: "projectMetric", x: 0, y: 0 },
+            { coordinateSpace: "projectMetric", x: 100, y: 0 },
+            { coordinateSpace: "projectMetric", x: 100, y: 100 },
+            { coordinateSpace: "projectMetric", x: 0, y: 100 },
+          ],
+        ],
+        accessPoints: [
+          {
+            deviceId: "ap-far" as DeviceId,
+            positionM: { coordinateSpace: "projectMetric", x: 25000, y: 0 },
+            txPowerDbm: 20,
+            antennaGainDbi: 3,
+          },
+        ],
+        obstacles: [],
+        settings: {
+          ...COVERAGE_DEFAULTS,
+        },
+        receiverAntennaGainDbi: 0,
+      };
+
+      await expect(computeCoverage(farInput, dummyContext)).rejects.toThrow(/AREA_TOO_LARGE/);
     });
   });
 });

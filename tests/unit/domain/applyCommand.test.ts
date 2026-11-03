@@ -441,4 +441,57 @@ describe("Domain Command Reducer: applyCommand", () => {
     expect(Object.keys(templateRes.nextAggregate.linksById)).toHaveLength(3);
     expect(templateRes.changeSet.upsertLinks).toHaveLength(3);
   });
+
+  it("enforces DESIGN_LIMITS: maxDevices (500) and maxLinks (1000)", () => {
+    // Test device limit
+    const mockDevices: Record<string, any> = {};
+    for (let i = 0; i < 500; i++) {
+      mockDevices[`d-${i}`] = { id: `d-${i}`, type: "switch", position: origin };
+    }
+    const maxedDevAggregate = {
+      ...initialAggregate,
+      devicesById: mockDevices,
+    };
+    const devRes = applyCommand(maxedDevAggregate, {
+      command: {
+        type: "device/add",
+        catalogItemId: switchCatalogItem.id,
+        position: origin,
+      },
+      stamp: { commandId: "cmd-dev-overflow", committedAt: 4000 as EpochMs },
+      generatedIds: { device: ["d-500" as DeviceId] },
+    });
+    expect(devRes.ok).toBe(false);
+    if (!devRes.ok) {
+      expect(devRes.issues[0]?.code).toBe("DEVICE_LIMIT_EXCEEDED");
+    }
+
+    // Test link limit
+    const mockLinks: Record<string, any> = {};
+    for (let i = 0; i < 1000; i++) {
+      mockLinks[`l-${i}`] = { id: `l-${i}` };
+    }
+    const maxedLinkAggregate = {
+      ...initialAggregate,
+      devicesById: {
+        d1: { id: "d1" as DeviceId, type: "switch", position: origin },
+        d2: { id: "d2" as DeviceId, type: "switch", position: origin },
+      },
+      linksById: mockLinks,
+    };
+    const linkRes = applyCommand(maxedLinkAggregate, {
+      command: {
+        type: "link/add",
+        sourceDeviceId: "d1" as DeviceId,
+        targetDeviceId: "d2" as DeviceId,
+        medium: "copper",
+      },
+      stamp: { commandId: "cmd-link-overflow", committedAt: 4100 as EpochMs },
+      generatedIds: { link: ["l-1000" as LinkId] },
+    });
+    expect(linkRes.ok).toBe(false);
+    if (!linkRes.ok) {
+      expect(linkRes.issues[0]?.code).toBe("LINK_LIMIT_EXCEEDED");
+    }
+  });
 });
