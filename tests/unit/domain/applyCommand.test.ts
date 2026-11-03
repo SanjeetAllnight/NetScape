@@ -5,6 +5,8 @@ import type {
   Project,
   MapRegion,
   Design,
+  Device,
+  Link,
   DeviceCatalogItem,
 } from "@/contracts/domain";
 import type {
@@ -444,9 +446,22 @@ describe("Domain Command Reducer: applyCommand", () => {
 
   it("enforces DESIGN_LIMITS: maxDevices (500) and maxLinks (1000)", () => {
     // Test device limit
-    const mockDevices: Record<string, any> = {};
+    const mockDevices: Record<DeviceId, Device> = {};
     for (let i = 0; i < 500; i++) {
-      mockDevices[`d-${i}`] = { id: `d-${i}`, type: "switch", position: origin };
+      const id = `d-${i}` as DeviceId;
+      mockDevices[id] = {
+        id,
+        designId: "des-1" as DesignId,
+        catalogItemId: switchCatalogItem.id,
+        type: "switch",
+        name: `Switch ${i}`,
+        hostname: null,
+        position: origin,
+        overrides: {},
+        notes: null,
+        createdAt: 1000 as EpochMs,
+        updatedAt: 1000 as EpochMs,
+      };
     }
     const maxedDevAggregate = {
       ...initialAggregate,
@@ -467,9 +482,23 @@ describe("Domain Command Reducer: applyCommand", () => {
     }
 
     // Test link limit
-    const mockLinks: Record<string, any> = {};
+    const mockLinks: Record<LinkId, Link> = {};
     for (let i = 0; i < 1000; i++) {
-      mockLinks[`l-${i}`] = { id: `l-${i}` };
+      const id = `l-${i}` as LinkId;
+      mockLinks[id] = {
+        id,
+        designId: "des-1" as DesignId,
+        sourceDeviceId: "d1" as DeviceId,
+        targetDeviceId: "d2" as DeviceId,
+        medium: "copper",
+        installationMethod: null,
+        geometry: { type: "LineString", coordinates: [origin.coordinates, origin.coordinates] },
+        capacityMbps: 1000,
+        routingWeight: 1,
+        lengthOverrideM: null,
+        createdAt: 1000 as EpochMs,
+        updatedAt: 1000 as EpochMs,
+      };
     }
     const maxedLinkAggregate = {
       ...initialAggregate,

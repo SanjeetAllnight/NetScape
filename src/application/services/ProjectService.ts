@@ -20,12 +20,21 @@ import type {
   LinkId,
   SubnetId,
   ObstacleId,
+  CatalogItemId,
+  AnalysisId,
+  AnalysisBlobId,
+  FlowId,
+  FailureScenarioId,
   EpochMs,
+  IdGenerator,
 } from "@/contracts/primitives";
 import type {
   Project,
   MapRegion,
   Design,
+  Device,
+  Link,
+  Subnet,
   ProjectSettings,
 } from "@/contracts/domain";
 import type {
@@ -39,19 +48,17 @@ import { createProjectFrame } from "@/domain/geo/localFrame";
 import { useProjectStore } from "@/stores/projectStore";
 import { usePrefsStore } from "@/stores/prefsStore";
 
-function mergeDeep<T extends Record<string, any>>(target: T, source: Record<string, any>): T {
-  const output = { ...target };
-  for (const key of Object.keys(source)) {
-    const val = source[key];
-    if (val !== undefined) {
-      if (val !== null && typeof val === "object" && !Array.isArray(val)) {
-        output[key as keyof T] = mergeDeep(target[key] ?? {}, val);
-      } else {
-        output[key as keyof T] = val;
-      }
-    }
-  }
-  return output;
+function mergeSettings(
+  target: ProjectSettings,
+  patch: DeepPartial<ProjectSettings>
+): ProjectSettings {
+  return {
+    cost: patch.cost ? { ...target.cost, ...patch.cost } : target.cost,
+    coverage: patch.coverage ? { ...target.coverage, ...patch.coverage } : target.coverage,
+    simulation: patch.simulation
+      ? { ...target.simulation, ...patch.simulation }
+      : target.simulation,
+  } as ProjectSettings;
 }
 
 export class DefaultProjectService implements ProjectService {
@@ -233,9 +240,9 @@ export class DefaultProjectService implements ProjectService {
     }
 
     // Remap devices, links, subnets per design
-    const newDevices: any[] = [];
-    const newLinks: any[] = [];
-    const newSubnets: any[] = [];
+    const newDevices: Device[] = [];
+    const newLinks: Link[] = [];
+    const newSubnets: Subnet[] = [];
 
     for (const agg of aggregates) {
       const oldDesignId = agg.design.id;
@@ -343,7 +350,7 @@ export class DefaultProjectService implements ProjectService {
       throw new Error(`Project '${projectId}' not found`);
     }
 
-    const merged = mergeDeep(project.settings, patch);
+    const merged = mergeSettings(project.settings, patch);
     const updated = await this.repos.projects.updateSettings(
       projectId,
       merged,
@@ -392,13 +399,19 @@ export class DefaultProjectService implements ProjectService {
     const newDesignId = `des_${crypto.randomUUID()}` as DesignId;
     const newName = name?.trim() || `${design.name} (Copy)`;
 
-    const idGen = {
+    const idGen: IdGenerator = {
+      project: () => `proj_${crypto.randomUUID()}` as ProjectId,
+      design: () => `des_${crypto.randomUUID()}` as DesignId,
+      mapRegion: () => `reg_${crypto.randomUUID()}` as MapRegionId,
       device: () => `dev_${crypto.randomUUID()}` as DeviceId,
       link: () => `link_${crypto.randomUUID()}` as LinkId,
       subnet: () => `sub_${crypto.randomUUID()}` as SubnetId,
       obstacle: () => `obs_${crypto.randomUUID()}` as ObstacleId,
-      flow: () => `flow_${crypto.randomUUID()}` as never,
-      failureScenario: () => `fail_${crypto.randomUUID()}` as never,
+      catalogItem: () => `cat_${crypto.randomUUID()}` as CatalogItemId,
+      analysis: () => `ana_${crypto.randomUUID()}` as AnalysisId,
+      analysisBlob: () => `blob_${crypto.randomUUID()}` as AnalysisBlobId,
+      flow: () => `flow_${crypto.randomUUID()}` as FlowId,
+      failureScenario: () => `fail_${crypto.randomUUID()}` as FailureScenarioId,
     };
 
     await this.repos.designs.duplicate(

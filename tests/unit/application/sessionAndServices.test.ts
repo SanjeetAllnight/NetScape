@@ -11,8 +11,10 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useAnalysisStore } from "@/stores/analysisStore";
 import { usePrefsStore } from "@/stores/prefsStore";
 import { makeGeoPoint } from "@/domain/geo/localFrame";
-import type { CatalogItemId, DeviceId, DesignId, ProjectId } from "@/contracts/primitives";
+import type { CatalogItemId, DeviceId, DesignId, ProjectId, AnalysisId, InputHash, EpochMs } from "@/contracts/primitives";
 import type { DesignCommittedEvent } from "@/contracts/services";
+import type { AnalysisRecord, CostBucket } from "@/contracts/engines";
+import { DEFAULT_PROJECT_SETTINGS } from "@/contracts/constants";
 
 describe("Phase 2 Application Services & Stores (P2-01)", () => {
   let db: NetScapeDatabase;
@@ -106,7 +108,7 @@ describe("Phase 2 Application Services & Stores (P2-01)", () => {
       // Verify device was remapped with a new ID
       const originalAgg = await repos.designs.loadAggregate(baselineDesignId);
       const origDevId = Object.keys(originalAgg.devicesById)[0]!;
-      const dupDevId = Object.keys(dupAgg.devicesById)[0]!;
+      const dupDevId = Object.keys(dupAgg.devicesById)[0]! as DeviceId;
       expect(dupDevId).not.toBe(origDevId);
       expect(dupAgg.devicesById[dupDevId]?.catalogItemId).toBe(catItem.id);
     });
@@ -316,23 +318,42 @@ describe("Phase 2 Application Services & Stores (P2-01)", () => {
       store.setProgress("coverage", 0.5);
       expect(useAnalysisStore.getState().progress.coverage).toBe(0.5);
 
-      store.setRecord(
-        "cost",
-        {
-          id: "ana-1" as any,
-          projectId: "p1" as ProjectId,
-          designId: "d1" as DesignId,
-          type: "cost",
-          engineId: "cost",
-          engineVersion: 1,
-          inputHash: "hash-1" as any,
-          parameters: { type: "cost", settings: {} as any },
+      const zeroBucket: CostBucket = {
+        knownSubtotal: { amount: 0, currency: "INR" },
+        total: { amount: 0, currency: "INR" },
+        completeness: "complete",
+      };
+
+      const mockCostRecord: AnalysisRecord = {
+        id: "ana-1" as AnalysisId,
+        projectId: "p1" as ProjectId,
+        designId: "d1" as DesignId,
+        type: "cost",
+        engineId: "cost",
+        engineVersion: 1,
+        inputHash: "hash-1" as InputHash,
+        parameters: { type: "cost", settings: DEFAULT_PROJECT_SETTINGS.cost },
+        isEstimate: true,
+        computedAt: 1000 as EpochMs,
+        result: {
+          currency: "INR",
           isEstimate: true,
-          computedAt: 1000 as any,
-          result: {} as any,
+          completeness: "complete",
+          capex: zeroBucket,
+          annualOpex: zeroBucket,
+          tco: zeroBucket,
+          tcoHorizonYears: 5,
+          byCategory: {},
+          lineItems: [],
+          issues: [],
+          assumptions: {
+            settings: DEFAULT_PROJECT_SETTINGS.cost,
+            devicePowerDutyRatio: 1,
+          },
         },
-        "hash-1" as any
-      );
+      };
+
+      store.setRecord("cost", mockCostRecord, "hash-1" as InputHash);
       expect(useAnalysisStore.getState().status.cost).toBe("fresh");
 
       store.markStale("cost");

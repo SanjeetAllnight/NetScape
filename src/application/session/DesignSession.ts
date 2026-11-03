@@ -37,7 +37,7 @@ import { useDesignStore } from "@/stores/designStore";
 export class DefaultDesignSession implements DesignSession {
   private currentAggregate: DesignAggregate | null = null;
   private currentDesignId: DesignId | null = null;
-  private queue: Promise<any> = Promise.resolve();
+  private queue: Promise<unknown> = Promise.resolve();
 
   private readonly listeners = {
     committed: new Set<(event: DesignCommittedEvent) => void>(),
@@ -75,8 +75,9 @@ export class DefaultDesignSession implements DesignSession {
       }
 
       return aggregate;
-    } catch (err: any) {
-      useDesignStore.getState().setSaveStatus("error", err?.message ?? "Failed to open design");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to open design";
+      useDesignStore.getState().setSaveStatus("error", message);
       throw err;
     }
   }
@@ -128,8 +129,9 @@ export class DefaultDesignSession implements DesignSession {
           designRevision: this.currentAggregate.design.revision,
         };
         await this.repos.designs.commit(result.changeSet, expected);
-      } catch (err: any) {
-        useDesignStore.getState().setSaveStatus("error", err?.message ?? "Storage commit failed");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Storage commit failed";
+        useDesignStore.getState().setSaveStatus("error", message);
         throw err;
       }
 
@@ -163,7 +165,7 @@ export class DefaultDesignSession implements DesignSession {
 
     // Chain serialized promise
     this.queue = this.queue.then(execute, execute);
-    return this.queue;
+    return this.queue as Promise<DispatchResult>;
   }
 
   async close(): Promise<void> {
@@ -191,8 +193,9 @@ export class DefaultDesignSession implements DesignSession {
     event: "rejected",
     listener: (payload: { command: DesignCommand; issues: ValidationIssue[] }) => void
   ): () => void;
-  on(event: string, listener: (...args: any[]) => void): () => void {
-    const set = (this.listeners as any)[event] as Set<any> | undefined;
+  on(event: string, listener: (payload: never) => void): () => void {
+    const key = event as keyof typeof this.listeners;
+    const set = this.listeners[key] as Set<(payload: never) => void> | undefined;
     if (set) {
       set.add(listener);
       return () => {

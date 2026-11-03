@@ -13,6 +13,13 @@ import type { GeocodingService, GeocodeResult } from "@/contracts/services";
 import type { BoundingBox, Latitude, Longitude } from "@/contracts/primitives";
 import { makeGeoPoint } from "@/domain/geo/localFrame";
 
+interface NominatimRawItem {
+  lat: string;
+  lon: string;
+  boundingbox?: string[];
+  display_name?: string;
+}
+
 export class NominatimGeocodingService implements GeocodingService {
   private lastRequestTime = 0;
   private readonly cache = new Map<string, GeocodeResult[]>();
@@ -63,17 +70,21 @@ export class NominatimGeocodingService implements GeocodingService {
         return [];
       }
 
-      const results: GeocodeResult[] = data.map((item: any) => {
+      const results: GeocodeResult[] = (data as NominatimRawItem[]).map((item) => {
         const lat = parseFloat(item.lat);
         const lon = parseFloat(item.lon);
-        const [minLat, maxLat, minLng, maxLng] = (item.boundingbox || []).map(parseFloat);
+        const rawBox = item.boundingbox ?? [];
+        const minLat = rawBox[0] !== undefined ? parseFloat(rawBox[0]) : NaN;
+        const maxLat = rawBox[1] !== undefined ? parseFloat(rawBox[1]) : NaN;
+        const minLng = rawBox[2] !== undefined ? parseFloat(rawBox[2]) : NaN;
+        const maxLng = rawBox[3] !== undefined ? parseFloat(rawBox[3]) : NaN;
 
-        const bbox: BoundingBox = {
-          minLng: (isNaN(minLng) ? lon - 0.01 : minLng) as Longitude,
-          minLat: (isNaN(minLat) ? lat - 0.01 : minLat) as Latitude,
-          maxLng: (isNaN(maxLng) ? lon + 0.01 : maxLng) as Longitude,
-          maxLat: (isNaN(maxLat) ? lat + 0.01 : maxLat) as Latitude,
-        };
+        const bbox: BoundingBox = [
+          (isNaN(minLng) ? lon - 0.01 : minLng) as Longitude,
+          (isNaN(minLat) ? lat - 0.01 : minLat) as Latitude,
+          (isNaN(maxLng) ? lon + 0.01 : maxLng) as Longitude,
+          (isNaN(maxLat) ? lat + 0.01 : maxLat) as Latitude,
+        ];
 
         return {
           providerId: "nominatim",

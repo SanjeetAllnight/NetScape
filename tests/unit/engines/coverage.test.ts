@@ -263,6 +263,7 @@ describe("Coverage Engine (P1-04)", () => {
         ],
         obstacles: [],
         settings: {
+          model: "logDistance",
           ...COVERAGE_DEFAULTS,
         },
         receiverAntennaGainDbi: 0,
