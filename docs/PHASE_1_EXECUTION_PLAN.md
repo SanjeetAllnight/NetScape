@@ -105,3 +105,4 @@ No unauthorized or deferred packages were introduced.
   - Implement application composition skeleton (`src/application/**`, `src/stores/**`).
   - Run full suite: `npm run check:full` (`typecheck`, `lint`, `test`, `deps:check`, `build`).
   - Publish `docs/PHASE_1_COMPLETION_REPORT.md`.
+

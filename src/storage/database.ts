@@ -59,3 +59,4 @@ export function getDatabase(): NetScapeDatabase {
   }
   return defaultDbInstance;
 }
+

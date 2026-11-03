@@ -111,3 +111,4 @@ describe("Application Composition Skeleton", () => {
     expect(useProjectStore.getState().error).toBeNull();
   });
 });
+

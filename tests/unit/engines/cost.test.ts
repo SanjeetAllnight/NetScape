@@ -187,3 +187,4 @@ describe("Cost Estimation Engine (P1-03)", () => {
     expect(estimate.issues.some((i) => i.code === "TAX_EXCLUDED")).toBe(true);
   });
 });
+
