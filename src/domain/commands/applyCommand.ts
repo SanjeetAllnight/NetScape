@@ -705,7 +705,11 @@ export function applyCommand(
         label: command.label ?? "Obstacle",
         geometry: command.geometry,
         material: command.material,
-        lossDbPerCrossing: command.lossDbPerCrossing ?? 10,
+        lossDbPerCrossing:
+          command.lossDbPerCrossing ??
+          (command.material !== "custom"
+            ? currentProject.settings.coverage.wallLossDbPerCrossing[command.material]
+            : 10),
         source: "manual",
         createdAt: stamp.committedAt,
         updatedAt: stamp.committedAt,

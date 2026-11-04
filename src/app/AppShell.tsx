@@ -1,8 +1,19 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { Network, Database, Settings, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export function AppShell() {
+  const location = useLocation();
+  const isWorkspace = location.pathname.includes("/designs/");
+
+  if (isWorkspace) {
+    return (
+      <div className="h-screen w-screen flex flex-col bg-surface-canvas text-text-primary overflow-hidden">
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-surface-canvas text-text-primary">
       {/* Top Header */}

@@ -1,13 +1,13 @@
 import { createHashRouter } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { NotFound } from "./NotFound";
-import { ProjectsPlaceholder } from "@/features/projects/ProjectsPlaceholder";
+import { ProjectsView } from "@/features/projects/ProjectsView";
 import { ProjectRedirectPlaceholder } from "@/features/projects/ProjectRedirectPlaceholder";
 import { ProjectDesignsPlaceholder } from "@/features/projects/ProjectDesignsPlaceholder";
 import { CatalogPlaceholder } from "@/features/catalog/CatalogPlaceholder";
 import { SettingsPlaceholder } from "@/features/settings/SettingsPlaceholder";
-import { MapWorkspacePlaceholder } from "@/features/map/MapWorkspacePlaceholder";
-import { TopologyPlaceholder } from "@/features/topology/TopologyPlaceholder";
+import { MapWorkspaceView } from "@/features/map/MapWorkspaceView";
+import { TopologyView } from "@/features/topology/TopologyView";
 import { AddressingPlaceholder } from "@/features/addressing/AddressingPlaceholder";
 import { CostPlaceholder } from "@/features/cost/CostPlaceholder";
 import { SimulationPlaceholder } from "@/features/simulation/SimulationPlaceholder";
@@ -22,7 +22,7 @@ export const router = createHashRouter([
     children: [
       {
         index: true,
-        element: <ProjectsPlaceholder />,
+        element: <ProjectsView />,
       },
       {
         path: "catalog",
@@ -42,11 +42,11 @@ export const router = createHashRouter([
       },
       {
         path: "projects/:projectId/designs/:designId/map",
-        element: <MapWorkspacePlaceholder />,
+        element: <MapWorkspaceView />,
       },
       {
         path: "projects/:projectId/designs/:designId/topology",
-        element: <TopologyPlaceholder />,
+        element: <TopologyView />,
       },
       {
         path: "projects/:projectId/designs/:designId/addressing",
