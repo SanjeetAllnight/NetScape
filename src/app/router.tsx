@@ -8,8 +8,8 @@ import { CatalogPlaceholder } from "@/features/catalog/CatalogPlaceholder";
 import { SettingsPlaceholder } from "@/features/settings/SettingsPlaceholder";
 import { MapWorkspaceView } from "@/features/map/MapWorkspaceView";
 import { TopologyView } from "@/features/topology/TopologyView";
-import { AddressingPlaceholder } from "@/features/addressing/AddressingPlaceholder";
-import { CostPlaceholder } from "@/features/cost/CostPlaceholder";
+import { AddressingView } from "@/features/addressing/AddressingView";
+import { CostView } from "@/features/cost/CostView";
 import { SimulationPlaceholder } from "@/features/simulation/SimulationPlaceholder";
 import { ReportPlaceholder } from "@/features/reports/ReportPlaceholder";
 import { ComparisonPlaceholder } from "@/features/comparison/ComparisonPlaceholder";
@@ -50,11 +50,11 @@ export const router = createHashRouter([
       },
       {
         path: "projects/:projectId/designs/:designId/addressing",
-        element: <AddressingPlaceholder />,
+        element: <AddressingView />,
       },
       {
         path: "projects/:projectId/designs/:designId/cost",
-        element: <CostPlaceholder />,
+        element: <CostView />,
       },
       {
         path: "projects/:projectId/designs/:designId/simulation",

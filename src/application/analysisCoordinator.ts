@@ -8,6 +8,7 @@
  * - Synchronous engine execution for cost
  * - Input hashing strictly outside Dexie transactions
  * - Analysis cache retention and blob retrieval
+ * - Ephemeral projection publication to useAnalysisStore
  */
 
 import type {
@@ -16,7 +17,7 @@ import type {
   AnalysisFreshnessEntry,
   AnalysisRunResult,
 } from "@/contracts/services";
-import type { DesignId, ProjectId, CatalogItemId, AnalysisId, EpochMs } from "@/contracts/primitives";
+import type { DesignId, ProjectId, CatalogItemId, AnalysisId, AnalysisBlobId, EpochMs } from "@/contracts/primitives";
 import type { AnalysisType } from "@/contracts/enums";
 import type {
   AnalysisRecord,
@@ -25,7 +26,7 @@ import type {
   DesignStamp,
 } from "@/contracts/engines";
 import type { Repositories } from "@/contracts/storage";
-import type { WorkerClient } from "@/contracts/workers";
+import type { WorkerClient, WorkerProgressMessage } from "@/contracts/workers";
 import {
   buildCostEngineInput,
   buildCoverageEngineInput,
@@ -33,8 +34,11 @@ import {
 } from "@/domain/inputBuilders";
 import { defaultCostEngine } from "@/engines/cost";
 import { EngineInputError } from "@/contracts/errors";
+import { useAnalysisStore } from "@/stores/analysisStore";
 
 export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
+  private readonly activeRequests = new Map<string, string>();
+
   constructor(
     private readonly repos: Repositories,
     private readonly workerClient: WorkerClient,
@@ -61,6 +65,14 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
       const cached = await this.repos.analyses.findByHash(designId, type, currentInputHash);
 
       if (cached) {
+        useAnalysisStore.getState().setRecord(type, cached, currentInputHash);
+        if (type === "coverage") {
+          const covRecord = cached as Extract<AnalysisRecord, { type: "coverage" }>;
+          const blob = await this.repos.analyses.getBlob(covRecord.result.grid.blobId);
+          if (blob) {
+            useAnalysisStore.getState().setCoverageBlob(blob);
+          }
+        }
         return {
           type,
           status: "current",
@@ -71,6 +83,15 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
 
       const latest = await this.repos.analyses.getLatest(designId, type);
       if (latest) {
+        useAnalysisStore.getState().setRecord(type, latest, currentInputHash);
+        useAnalysisStore.getState().markStale(type);
+        if (type === "coverage") {
+          const covRecord = latest as Extract<AnalysisRecord, { type: "coverage" }>;
+          const blob = await this.repos.analyses.getBlob(covRecord.result.grid.blobId);
+          if (blob) {
+            useAnalysisStore.getState().setCoverageBlob(blob);
+          }
+        }
         return {
           type,
           status: "outOfDate",
@@ -79,6 +100,7 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
         };
       }
 
+      useAnalysisStore.getState().setRecord(type, null, currentInputHash);
       return {
         type,
         status: "notCalculated",
@@ -104,11 +126,11 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
   }
 
   async refreshProject(_projectId: ProjectId): Promise<void> {
-    // Read-only freshness inspection handles lazy re-computation; no-op in skeleton
+    // Read-only freshness inspection handles lazy re-computation
   }
 
   async refreshCatalogItem(_catalogItemId: CatalogItemId): Promise<void> {
-    // Lazy freshness inspection; no-op in skeleton
+    // Lazy freshness inspection handles catalog item changes
   }
 
   async run(type: "cost" | "coverage" | "simulation", designId: DesignId): Promise<AnalysisRunResult> {
@@ -117,40 +139,131 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
       throw new EngineInputError(`Design not found: ${designId}`);
     }
 
-    if (type === "cost") {
-      const input = buildCostEngineInput(aggregate);
-      const inputHash = await this.hashService.hashCanonical(input);
+    useAnalysisStore.getState().setStatus(type, "computing");
+    useAnalysisStore.getState().setProgress(type, 0);
 
-      const cached = await this.repos.analyses.findByHash(designId, "cost", inputHash);
-      if (cached) {
-        return { record: cached, cacheHit: true, freshness: "current" };
+    try {
+      if (type === "cost") {
+        const input = buildCostEngineInput(aggregate);
+        const inputHash = await this.hashService.hashCanonical(input);
+
+        const cached = await this.repos.analyses.findByHash(designId, "cost", inputHash);
+        if (cached) {
+          useAnalysisStore.getState().setRecord("cost", cached, inputHash);
+          return { record: cached, cacheHit: true, freshness: "current" };
+        }
+
+        const result = defaultCostEngine.estimate(input);
+        const record: AnalysisRecord = {
+          id: `ana_cost_${Date.now()}` as AnalysisId,
+          projectId: aggregate.project.id,
+          designId,
+          type: "cost",
+          engineId: "cost",
+          engineVersion: 1,
+          inputHash,
+          parameters: { type: "cost", settings: aggregate.project.settings.cost },
+          isEstimate: true,
+          computedAt: Date.now() as EpochMs,
+          result,
+        };
+
+        await this.repos.analyses.put(record);
+        useAnalysisStore.getState().setRecord("cost", record, inputHash);
+        return { record, cacheHit: false, freshness: "current" };
       }
 
-      const result = defaultCostEngine.estimate(input);
-      const record: AnalysisRecord = {
-        id: `ana_cost_${Date.now()}` as AnalysisId,
-        projectId: aggregate.project.id,
-        designId,
-        type: "cost",
-        engineId: "cost",
-        engineVersion: 1,
-        inputHash,
-        parameters: { type: "cost", settings: aggregate.project.settings.cost },
-        isEstimate: true,
-        computedAt: Date.now() as EpochMs,
-        result,
-      };
+      if (type === "coverage") {
+        const input = buildCoverageEngineInput(aggregate);
+        const inputHash = await this.hashService.hashCanonical(input);
 
-      await this.repos.analyses.put(record);
-      return { record, cacheHit: false, freshness: "current" };
-    }
+        const cached = await this.repos.analyses.findByHash(designId, "coverage", inputHash);
+        if (cached) {
+          const covRecord = cached as Extract<AnalysisRecord, { type: "coverage" }>;
+          const blob = await this.repos.analyses.getBlob(covRecord.result.grid.blobId);
+          useAnalysisStore.getState().setRecord("coverage", cached, inputHash);
+          if (blob) {
+            useAnalysisStore.getState().setCoverageBlob(blob);
+          }
+          return { record: cached, cacheHit: true, freshness: "current" };
+        }
 
-    if (type === "coverage") {
-      const input = buildCoverageEngineInput(aggregate);
+        const stamp: DesignStamp = {
+          projectId: aggregate.project.id,
+          designId,
+          projectRevision: aggregate.project.revision,
+          designRevision: aggregate.design.revision,
+          inputHash,
+        };
+
+        const handleKey = `${designId}:coverage`;
+        const handle = this.workerClient.run(
+          "coverage.compute",
+          input,
+          stamp,
+          (progress: WorkerProgressMessage) => {
+            useAnalysisStore.getState().setProgress("coverage", progress.fraction);
+          }
+        );
+        this.activeRequests.set(handleKey, handle.requestId);
+
+        let workerOutput;
+        try {
+          workerOutput = await handle.result;
+        } finally {
+          this.activeRequests.delete(handleKey);
+        }
+
+        const now = Date.now() as EpochMs;
+        const blobId = `blob_cov_${now}_${Math.random().toString(36).slice(2, 7)}` as AnalysisBlobId;
+        const analysisId = `ana_cov_${now}` as AnalysisId;
+
+        const blob: AnalysisBlob = {
+          id: blobId,
+          analysisId,
+          projectId: aggregate.project.id,
+          designId,
+          width: workerOutput.result.grid.width,
+          height: workerOutput.result.grid.height,
+          rssiDbm: workerOutput.rssiDbm,
+          servingIndex: workerOutput.servingIndex,
+          servingAccessPointIds: workerOutput.servingAccessPointIds,
+          createdAt: now,
+        };
+
+        const record: AnalysisRecord = {
+          id: analysisId,
+          projectId: aggregate.project.id,
+          designId,
+          type: "coverage",
+          engineId: "coverage",
+          engineVersion: 1,
+          inputHash,
+          parameters: { type: "coverage", settings: aggregate.project.settings.coverage },
+          isEstimate: true,
+          computedAt: now,
+          result: {
+            ...workerOutput.result,
+            grid: {
+              ...workerOutput.result.grid,
+              blobId,
+            },
+          },
+        };
+
+        await this.repos.analyses.put(record, blob);
+        useAnalysisStore.getState().setRecord("coverage", record, inputHash);
+        useAnalysisStore.getState().setCoverageBlob(blob);
+        return { record, cacheHit: false, freshness: "current" };
+      }
+
+      // Simulation
+      const input = buildSimulationEngineInput(aggregate);
       const inputHash = await this.hashService.hashCanonical(input);
 
-      const cached = await this.repos.analyses.findByHash(designId, "coverage", inputHash);
+      const cached = await this.repos.analyses.findByHash(designId, "simulation", inputHash);
       if (cached) {
+        useAnalysisStore.getState().setRecord("simulation", cached, inputHash);
         return { record: cached, cacheHit: true, freshness: "current" };
       }
 
@@ -162,77 +275,61 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
         inputHash,
       };
 
-      const handle = this.workerClient.run("coverage.compute", input, stamp);
-      const workerOutput = await handle.result;
+      const handleKey = `${designId}:simulation`;
+      const handle = this.workerClient.run(
+        "simulation.run",
+        input,
+        stamp,
+        (progress: WorkerProgressMessage) => {
+          useAnalysisStore.getState().setProgress("simulation", progress.fraction);
+        }
+      );
+      this.activeRequests.set(handleKey, handle.requestId);
 
+      let workerOutput;
+      try {
+        workerOutput = await handle.result;
+      } finally {
+        this.activeRequests.delete(handleKey);
+      }
+
+      const now = Date.now() as EpochMs;
       const record: AnalysisRecord = {
-        id: `ana_cov_${Date.now()}` as AnalysisId,
+        id: `ana_sim_${now}` as AnalysisId,
         projectId: aggregate.project.id,
         designId,
-        type: "coverage",
-        engineId: "coverage",
+        type: "simulation",
+        engineId: "simulation",
         engineVersion: 1,
         inputHash,
-        parameters: { type: "coverage", settings: aggregate.project.settings.coverage },
-        isEstimate: true,
-        computedAt: Date.now() as EpochMs,
-        result: {
-          ...workerOutput.result,
-          grid: {
-            ...workerOutput.result.grid,
-            blobId: `blob_cov_${Date.now()}` as never,
-          },
+        parameters: {
+          type: "simulation",
+          settings: aggregate.project.settings.simulation,
+          setup: aggregate.design.simulationSetup,
         },
+        isEstimate: true,
+        computedAt: now,
+        result: workerOutput.result,
       };
 
       await this.repos.analyses.put(record);
+      useAnalysisStore.getState().setRecord("simulation", record, inputHash);
       return { record, cacheHit: false, freshness: "current" };
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      useAnalysisStore.getState().setError(type, errMsg);
+      throw err;
     }
-
-    // Simulation
-    const input = buildSimulationEngineInput(aggregate);
-    const inputHash = await this.hashService.hashCanonical(input);
-
-    const cached = await this.repos.analyses.findByHash(designId, "simulation", inputHash);
-    if (cached) {
-      return { record: cached, cacheHit: true, freshness: "current" };
-    }
-
-    const stamp: DesignStamp = {
-      projectId: aggregate.project.id,
-      designId,
-      projectRevision: aggregate.project.revision,
-      designRevision: aggregate.design.revision,
-      inputHash,
-    };
-
-    const handle = this.workerClient.run("simulation.run", input, stamp);
-    const workerOutput = await handle.result;
-
-    const record: AnalysisRecord = {
-      id: `ana_sim_${Date.now()}` as AnalysisId,
-      projectId: aggregate.project.id,
-      designId,
-      type: "simulation",
-      engineId: "simulation",
-      engineVersion: 1,
-      inputHash,
-      parameters: {
-        type: "simulation",
-        settings: aggregate.project.settings.simulation,
-        setup: aggregate.design.simulationSetup,
-      },
-      isEstimate: true,
-      computedAt: Date.now() as EpochMs,
-      result: workerOutput.result,
-    };
-
-    await this.repos.analyses.put(record);
-    return { record, cacheHit: false, freshness: "current" };
   }
 
-  async cancel(_type: "coverage" | "simulation", _designId: DesignId): Promise<void> {
-    // Cancellation is managed by active request ID in WorkerClient
+  async cancel(type: "coverage" | "simulation", designId: DesignId): Promise<void> {
+    const handleKey = `${designId}:${type}`;
+    const requestId = this.activeRequests.get(handleKey);
+    if (requestId) {
+      await this.workerClient.cancel(requestId);
+      this.activeRequests.delete(handleKey);
+      useAnalysisStore.getState().setStatus(type, "idle");
+    }
   }
 
   async getLatest(designId: DesignId, type: AnalysisType): Promise<AnalysisRecord | null> {

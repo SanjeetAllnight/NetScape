@@ -8,7 +8,7 @@
 import { create } from "zustand";
 import type { AnalysisType } from "@/contracts/enums";
 import type { InputHash } from "@/contracts/primitives";
-import type { AnalysisRecord } from "@/contracts/engines";
+import type { AnalysisRecord, AnalysisBlob } from "@/contracts/engines";
 
 export type AnalysisStatus = "idle" | "computing" | "stale" | "fresh" | "error";
 
@@ -18,8 +18,10 @@ export interface AnalysisStoreState {
   status: Record<AnalysisType, AnalysisStatus>;
   progress: Record<AnalysisType, number>;
   errors: Record<AnalysisType, string | null>;
+  coverageBlob: AnalysisBlob | null;
 
   setRecord: (type: AnalysisType, record: AnalysisRecord | null, hash: InputHash | null) => void;
+  setCoverageBlob: (blob: AnalysisBlob | null) => void;
   setStatus: (type: AnalysisType, status: AnalysisStatus) => void;
   setProgress: (type: AnalysisType, progress: number) => void;
   setError: (type: AnalysisType, error: string | null) => void;
@@ -63,6 +65,7 @@ export const useAnalysisStore = create<AnalysisStoreState>((set) => ({
   status: { ...INITIAL_STATUS },
   progress: { ...INITIAL_PROGRESS },
   errors: { ...INITIAL_ERRORS },
+  coverageBlob: null,
 
   setRecord: (type, record, hash) =>
     set((state) => ({
@@ -72,6 +75,8 @@ export const useAnalysisStore = create<AnalysisStoreState>((set) => ({
       errors: { ...state.errors, [type]: null },
       progress: { ...state.progress, [type]: 1 },
     })),
+
+  setCoverageBlob: (coverageBlob) => set({ coverageBlob }),
 
   setStatus: (type, status) =>
     set((state) => ({
@@ -104,6 +109,7 @@ export const useAnalysisStore = create<AnalysisStoreState>((set) => ({
       status: { ...INITIAL_STATUS },
       progress: { ...INITIAL_PROGRESS },
       errors: { ...INITIAL_ERRORS },
+      coverageBlob: null,
     }),
 }));
 
