@@ -34,6 +34,13 @@ export interface MapViewport {
   zoom: number;
 }
 
+export interface CoverageOverlayState {
+  visible: boolean;
+  opacity: number;
+  showDeadZones: boolean;
+  isDockOpen: boolean;
+}
+
 export interface EditorStoreState {
   activeTool: EditorTool;
   catalogItemIdToPlace: CatalogItemId | null;
@@ -41,6 +48,7 @@ export interface EditorStoreState {
   selectedEntity: SelectedEntity | null;
   linkDraft: LinkDraft | null;
   viewport: MapViewport;
+  coverageOverlay: CoverageOverlayState;
 
   setActiveTool: (tool: EditorTool) => void;
   setCatalogItemIdToPlace: (id: CatalogItemId | null) => void;
@@ -48,12 +56,20 @@ export interface EditorStoreState {
   setSelectedEntity: (entity: SelectedEntity | null) => void;
   setLinkDraft: (draft: LinkDraft | null) => void;
   setViewport: (viewport: MapViewport) => void;
+  setCoverageOverlay: (patch: Partial<CoverageOverlayState>) => void;
   resetEditor: () => void;
 }
 
 const DEFAULT_VIEWPORT: MapViewport = {
   center: [12.9716, 77.5946], // Bangalore default
   zoom: 16,
+};
+
+const DEFAULT_COVERAGE_OVERLAY: CoverageOverlayState = {
+  visible: true,
+  opacity: 0.65,
+  showDeadZones: true,
+  isDockOpen: false,
 };
 
 export const useEditorStore = create<EditorStoreState>((set) => ({
@@ -63,6 +79,15 @@ export const useEditorStore = create<EditorStoreState>((set) => ({
   selectedEntity: null,
   linkDraft: null,
   viewport: DEFAULT_VIEWPORT,
+  coverageOverlay: DEFAULT_COVERAGE_OVERLAY,
+
+  setCoverageOverlay: (patch) =>
+    set((state) => ({
+      coverageOverlay: {
+        ...state.coverageOverlay,
+        ...patch,
+      },
+    })),
 
   setActiveTool: (activeTool) =>
     set({
@@ -92,6 +117,7 @@ export const useEditorStore = create<EditorStoreState>((set) => ({
       obstacleMaterialToPlace: "brick",
       selectedEntity: null,
       linkDraft: null,
+      coverageOverlay: DEFAULT_COVERAGE_OVERLAY,
     }),
 }));
 

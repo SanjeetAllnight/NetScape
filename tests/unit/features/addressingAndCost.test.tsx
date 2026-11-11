@@ -7,12 +7,11 @@ import { DefaultProjectService } from "@/application/services/ProjectService";
 import { DefaultDesignSession } from "@/application/session/DesignSession";
 import { DefaultAnalysisCoordinator } from "@/application/analysisCoordinator";
 import { allocateVlsm } from "@/engines/ip";
-import { defaultCostEngine } from "@/engines/cost";
-import { buildCostEngineInput } from "@/domain/inputBuilders";
+import type { CostEstimate } from "@/contracts/engines";
 import { useDesignStore } from "@/stores/designStore";
 import { useAnalysisStore } from "@/stores/analysisStore";
 import { makeGeoPoint } from "@/domain/geo/localFrame";
-import type { IPv4Cidr, DeviceId, SubnetId, EpochMs } from "@/contracts/primitives";
+import type { IPv4Cidr, SubnetId, EpochMs } from "@/contracts/primitives";
 import type { Device, DeviceCatalogItem } from "@/contracts/domain";
 
 describe("Phase 3 Stage B — Addressing (P3-01) and Cost (P3-02)", () => {
@@ -229,7 +228,7 @@ describe("Phase 3 Stage B — Addressing (P3-01) and Cost (P3-02)", () => {
       expect(res.cacheHit).toBe(false);
       expect(res.freshness).toBe("current");
 
-      const estimate = res.record.result as ReturnType<typeof defaultCostEngine.estimate>;
+      const estimate = res.record.result as CostEstimate;
       expect(estimate.isEstimate).toBe(true);
       expect(estimate.currency).toBe("INR");
       expect(estimate.tcoHorizonYears).toBe(5);
@@ -292,3 +291,4 @@ describe("Phase 3 Stage B — Addressing (P3-01) and Cost (P3-02)", () => {
     });
   });
 });
+

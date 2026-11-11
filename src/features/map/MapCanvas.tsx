@@ -3,11 +3,13 @@ import L from "leaflet";
 import "@geoman-io/leaflet-geoman-free";
 import { useDesignStore } from "@/stores/designStore";
 import { useEditorStore } from "@/stores/editorStore";
+import { useAnalysisStore } from "@/stores/analysisStore";
 import { getApplicationContainer } from "@/application/container";
-import { makeGeoPoint } from "@/domain/geo/localFrame";
+import { makeGeoPoint, localPointToGeo } from "@/domain/geo/localFrame";
 import type { Device, Obstacle, Link } from "@/contracts/domain";
-import type { Longitude, Latitude } from "@/contracts/primitives";
+import type { Longitude, Latitude, Vec2 } from "@/contracts/primitives";
 import type { DeviceType, ObstacleMaterial } from "@/contracts/enums";
+import type { AnalysisRecord } from "@/contracts/engines";
 
 // Material color definitions
 const OBSTACLE_STYLES: Record<ObstacleMaterial, { color: string; fillColor: string; opacity: number; fillOpacity: number }> = {
@@ -72,6 +74,9 @@ export function MapCanvas() {
   const selectedEntity = useEditorStore((s) => s.selectedEntity);
   const viewport = useEditorStore((s) => s.viewport);
   const linkDraft = useEditorStore((s) => s.linkDraft);
+  const coverageOverlay = useEditorStore((s) => s.coverageOverlay);
+  const coverageRecord = useAnalysisStore((s) => s.records.coverage as (Extract<AnalysisRecord, { type: "coverage" }>) | null);
+  const coverageBlob = useAnalysisStore((s) => s.coverageBlob);
 
   // References to keep event handlers current
   const activeToolRef = useRef(activeTool);
@@ -85,6 +90,7 @@ export function MapCanvas() {
 
   // Layer groups
   const boundaryLayerRef = useRef<L.LayerGroup>(L.layerGroup());
+  const coverageLayerRef = useRef<L.LayerGroup>(L.layerGroup());
   const obstaclesLayerRef = useRef<L.LayerGroup>(L.layerGroup());
   const linksLayerRef = useRef<L.LayerGroup>(L.layerGroup());
   const devicesLayerRef = useRef<L.LayerGroup>(L.layerGroup());
@@ -122,6 +128,7 @@ export function MapCanvas() {
 
     // Add layer groups in order
     boundaryLayerRef.current.addTo(map);
+    coverageLayerRef.current.addTo(map);
     obstaclesLayerRef.current.addTo(map);
     linksLayerRef.current.addTo(map);
     devicesLayerRef.current.addTo(map);
@@ -234,6 +241,142 @@ export function MapCanvas() {
       map.pm.disableDraw();
     }
   }, [activeTool]);
+
+  // Programmatic Viewport Synchronization (e.g. Focus on Dead Zone)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    const currentCenter = map.getCenter();
+    const currentZoom = map.getZoom();
+    const [targetLat, targetLng] = viewport.center;
+    const dist = Math.hypot(currentCenter.lat - targetLat, currentCenter.lng - targetLng);
+    if (dist > 1e-5 || currentZoom !== viewport.zoom) {
+      map.setView(viewport.center, viewport.zoom);
+    }
+  }, [viewport.center, viewport.zoom]);
+
+  // Declarative Coverage Raster Overlay Render
+  useEffect(() => {
+    const group = coverageLayerRef.current;
+    group.clearLayers();
+
+    if (
+      !coverageOverlay.visible ||
+      !coverageBlob ||
+      !coverageRecord ||
+      !aggregate?.project.frame
+    ) {
+      return;
+    }
+
+    const { width, height } = coverageBlob;
+    if (width <= 0 || height <= 0) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const imgData = ctx.createImageData(width, height);
+    const data = imgData.data;
+
+    const thresholds = coverageRecord.result.parameters?.signalThresholdsDbm ?? {
+      excellentMin: -65,
+      goodMin: -75,
+      fairMin: -85,
+      weakMin: -90,
+    };
+    const alpha = Math.min(255, Math.max(0, Math.round((coverageOverlay.opacity ?? 0.7) * 255)));
+
+    for (let canvasRow = 0; canvasRow < height; canvasRow++) {
+      // In cartesian frame, row 0 is minY (South) and row height-1 is maxY (North).
+      // On canvas, canvasRow 0 is North and canvasRow height-1 is South.
+      const dataRow = height - 1 - canvasRow;
+      for (let col = 0; col < width; col++) {
+        const dataIdx = dataRow * width + col;
+        const pxIdx = (canvasRow * width + col) * 4;
+        const serving = coverageBlob.servingIndex[dataIdx];
+        const rssi = coverageBlob.rssiDbm[dataIdx] ?? -127;
+
+        if (serving === 254) {
+          // Outside planning mask
+          data[pxIdx] = 0;
+          data[pxIdx + 1] = 0;
+          data[pxIdx + 2] = 0;
+          data[pxIdx + 3] = 0;
+        } else if (serving === 255 || rssi < thresholds.weakMin) {
+          // Inside mask, dead zone
+          if (coverageOverlay.showDeadZones) {
+            data[pxIdx] = 239;
+            data[pxIdx + 1] = 68;
+            data[pxIdx + 2] = 68;
+            data[pxIdx + 3] = Math.min(255, Math.round(alpha * 1.15));
+          } else {
+            data[pxIdx] = 0;
+            data[pxIdx + 1] = 0;
+            data[pxIdx + 2] = 0;
+            data[pxIdx + 3] = 0;
+          }
+        } else if (rssi >= thresholds.excellentMin) {
+          // Excellent: Emerald green #10B981
+          data[pxIdx] = 16;
+          data[pxIdx + 1] = 185;
+          data[pxIdx + 2] = 129;
+          data[pxIdx + 3] = alpha;
+        } else if (rssi >= thresholds.goodMin) {
+          // Good: Sky blue #0297DE
+          data[pxIdx] = 2;
+          data[pxIdx + 1] = 151;
+          data[pxIdx + 2] = 222;
+          data[pxIdx + 3] = alpha;
+        } else if (rssi >= thresholds.fairMin) {
+          // Fair: Amber #F59E0B
+          data[pxIdx] = 245;
+          data[pxIdx + 1] = 158;
+          data[pxIdx + 2] = 11;
+          data[pxIdx + 3] = alpha;
+        } else {
+          // Weak: Orange #F97316
+          data[pxIdx] = 249;
+          data[pxIdx + 1] = 115;
+          data[pxIdx + 2] = 22;
+          data[pxIdx + 3] = alpha;
+        }
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+
+    const grid = coverageRecord.result.grid;
+    const nwM: Vec2 = grid.topLeftLocalM;
+    const seM: Vec2 = {
+      coordinateSpace: "projectMetric",
+      x: nwM.x + grid.width * grid.cellSizeM,
+      y: nwM.y - grid.height * grid.cellSizeM,
+    };
+
+    const nwGeo = localPointToGeo(nwM, aggregate.project.frame);
+    const seGeo = localPointToGeo(seM, aggregate.project.frame);
+    const bounds = L.latLngBounds(
+      [nwGeo.coordinates[1], nwGeo.coordinates[0]],
+      [seGeo.coordinates[1], seGeo.coordinates[0]]
+    );
+
+    const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { interactive: false });
+    group.addLayer(overlay);
+
+    return () => {
+      group.clearLayers();
+    };
+  }, [
+    coverageOverlay.visible,
+    coverageOverlay.opacity,
+    coverageOverlay.showDeadZones,
+    coverageBlob,
+    coverageRecord,
+    aggregate?.project.frame,
+  ]);
 
   // Declarative Boundary Render
   useEffect(() => {

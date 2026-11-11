@@ -9,6 +9,7 @@ import { DevicePalette } from "@/features/designer/DevicePalette";
 import { DeviceInspector } from "@/features/designer/DeviceInspector";
 import { LinkInspector } from "@/features/designer/LinkInspector";
 import { TemplateModal } from "@/features/designer/TemplateModal";
+import { CoverageDock } from "@/features/coverage/CoverageDock";
 import type { DesignId } from "@/contracts/primitives";
 import type { GeocodeResult } from "@/contracts/services";
 
@@ -162,6 +163,9 @@ export function MapWorkspaceView() {
               isOpen={isTemplateModalOpen}
               onClose={() => setIsTemplateModalOpen(false)}
             />
+
+            {/* Wireless RF Coverage Contextual Dock */}
+            <CoverageDock />
           </>
         )}
       </div>

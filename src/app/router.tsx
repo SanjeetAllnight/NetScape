@@ -10,9 +10,9 @@ import { MapWorkspaceView } from "@/features/map/MapWorkspaceView";
 import { TopologyView } from "@/features/topology/TopologyView";
 import { AddressingView } from "@/features/addressing/AddressingView";
 import { CostView } from "@/features/cost/CostView";
-import { SimulationPlaceholder } from "@/features/simulation/SimulationPlaceholder";
+import { SimulationView } from "@/features/simulation/SimulationView";
 import { ReportPlaceholder } from "@/features/reports/ReportPlaceholder";
-import { ComparisonPlaceholder } from "@/features/comparison/ComparisonPlaceholder";
+import { ComparisonView } from "@/features/comparison/ComparisonView";
 
 export const router = createHashRouter([
   {
@@ -58,7 +58,7 @@ export const router = createHashRouter([
       },
       {
         path: "projects/:projectId/designs/:designId/simulation",
-        element: <SimulationPlaceholder />,
+        element: <SimulationView />,
       },
       {
         path: "projects/:projectId/designs/:designId/report",
@@ -66,7 +66,7 @@ export const router = createHashRouter([
       },
       {
         path: "projects/:projectId/compare",
-        element: <ComparisonPlaceholder />,
+        element: <ComparisonView />,
       },
       {
         path: "*",

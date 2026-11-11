@@ -561,6 +561,9 @@ export function applyCommand(
 
       currentSubnets[subnetId] = newSubnet;
       upsertSubnets.push(newSubnet);
+      if (currentDesign.addressing.allocationStatus === "current") {
+        currentDesign.addressing.allocationStatus = "outOfDate";
+      }
       designUpdated = true;
       affectedAnalysisTypes.add("simulation");
       break;
@@ -586,6 +589,9 @@ export function applyCommand(
         } else {
           sub.hostsRequired = command.patch.hostsRequired;
           sub.allocationStatus = "outOfDate";
+          if (currentDesign.addressing.allocationStatus === "current") {
+            currentDesign.addressing.allocationStatus = "outOfDate";
+          }
         }
       }
       if (command.patch.servedByDeviceId !== undefined) {
@@ -621,6 +627,10 @@ export function applyCommand(
 
       // Clean flows
       currentDesign.simulationSetup.flows = currentDesign.simulationSetup.flows.filter((f) => f.sourceSubnetId !== subId);
+
+      if (currentDesign.addressing.allocationStatus === "current") {
+        currentDesign.addressing.allocationStatus = "outOfDate";
+      }
 
       designUpdated = true;
       affectedAnalysisTypes.add("simulation");

@@ -317,7 +317,11 @@ export class DefaultAnalysisCoordinator implements AnalysisCoordinator {
       return { record, cacheHit: false, freshness: "current" };
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      useAnalysisStore.getState().setError(type, errMsg);
+      if (errMsg.toLowerCase().includes("cancel")) {
+        useAnalysisStore.getState().setStatus(type, "idle");
+      } else {
+        useAnalysisStore.getState().setError(type, errMsg);
+      }
       throw err;
     }
   }

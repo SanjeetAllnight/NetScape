@@ -19,11 +19,9 @@ import {
 import { ProjectHeader } from "@/features/shell/ProjectHeader";
 import { useDesignStore } from "@/stores/designStore";
 import { getApplicationContainer } from "@/application/container";
-import { allocateVlsm } from "@/engines/ip";
-import { parseCidr, ipv4ToUint32, prefixToNetmask } from "@/engines/ip/ipEngine";
-import type { DesignId, DeviceId, SubnetId, IPv4Cidr, EpochMs } from "@/contracts/primitives";
+import type { DesignId, DeviceId, SubnetId, IPv4Cidr } from "@/contracts/primitives";
 import type { Subnet, Device } from "@/contracts/domain";
-import type { VlsmEngineOutput, VlsmSubnetRequirement } from "@/contracts/engines";
+import type { VlsmEngineOutput } from "@/contracts/engines";
 
 export function AddressingView() {
   const { designId } = useParams<{ projectId: string; designId: string }>();
@@ -80,31 +78,9 @@ export function AddressingView() {
 
   // Validate CIDR syntax and canonical host-bits rule
   const validateCidr = (cidrStr: string): string | null => {
-    const trimmed = cidrStr.trim();
-    if (!trimmed) return "Parent CIDR cannot be empty";
-
-    const match = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/.exec(trimmed);
-    if (!match || !match[1] || !match[2]) {
-      return "Must be valid IPv4 CIDR format (e.g. 10.0.0.0/16 or 192.168.1.0/24)";
-    }
-
-    const prefix = parseInt(match[2], 10);
-    if (prefix < 8 || prefix > 30) {
-      return "Prefix length must be between /8 and /30";
-    }
-
-    try {
-      const parsed = parseCidr(trimmed as IPv4Cidr);
-      const uint = ipv4ToUint32(parsed.address);
-      const mask = prefixToNetmask(parsed.prefix);
-      if ((uint & (~mask >>> 0)) !== 0) {
-        return `Non-canonical network address. Host bits must be zero (did you mean ${parsed.networkAddress}/${parsed.prefix}?)`;
-      }
-    } catch (e: unknown) {
-      return e instanceof Error ? e.message : "Invalid IPv4 CIDR";
-    }
-
-    return null;
+    const container = getApplicationContainer();
+    const res = container.addressingService.validateCidr(cidrStr);
+    return res.valid ? null : (res.error ?? "Invalid IPv4 CIDR");
   };
 
   // Commit Parent CIDR change
@@ -205,32 +181,9 @@ export function AddressingView() {
     setAllocationError(null);
 
     try {
-      const requirements: VlsmSubnetRequirement[] = subnets.map((s) => ({
-        subnetId: s.id,
-        name: s.name,
-        hostsRequired: s.hostsRequired,
-      }));
-
-      // Pure synchronous deterministic engine call
-      const output = allocateVlsm({
-        parentCidr,
-        subnets: requirements,
-      });
-
-      setLastVlsmOutput(output);
-
-      // Persist allocation to authored subnets via domain command
       const container = getApplicationContainer();
-      const commitRes = await container.designSession.dispatch({
-        type: "addressing/applyAllocation",
-        parentCidr,
-        allocations: output.allocations,
-        allocatedAt: Date.now() as EpochMs,
-      });
-
-      if (commitRes.status === "rejected") {
-        setAllocationError(commitRes.issues.map((i) => i.message).join(", "));
-      }
+      const output = await container.addressingService.allocate(designId as DesignId);
+      setLastVlsmOutput(output);
     } catch (err: unknown) {
       setAllocationError(err instanceof Error ? err.message : "VLSM allocation failed");
     } finally {

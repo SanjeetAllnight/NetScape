@@ -15,9 +15,11 @@ import type {
   SimulationEngineInput,
   SimulationNodeInput,
   SimulationEdgeInput,
+  SimulationFlowInput,
   VlsmEngineInput,
   VlsmSubnetRequirement,
 } from "@/contracts/engines";
+import type { FlowId } from "@/contracts/primitives";
 import { resolveDevice } from "@/domain/catalog/resolveDevice";
 import { deriveLinkLengthM, geoPolygonToLocal, checkPlanningExtent } from "@/domain/geo/localFrame";
 import { EngineInputError } from "@/contracts/errors";
@@ -141,7 +143,7 @@ export function buildSimulationEngineInput(aggregate: DesignAggregate): Simulati
     };
   });
 
-  const flows = aggregate.design.simulationSetup.flows.map((f) => {
+  let flows: SimulationFlowInput[] = aggregate.design.simulationSetup.flows.map((f) => {
     const sub = aggregate.subnetsById[f.sourceSubnetId];
     const sourceDevId = sub?.servedByDeviceId ?? f.destinationDeviceId;
     const demand =
@@ -155,6 +157,27 @@ export function buildSimulationEngineInput(aggregate: DesignAggregate): Simulati
       demandMbps: demand,
     };
   });
+
+  if (flows.length === 0) {
+    const servers = Object.values(aggregate.devicesById).filter((d) => d.type === "server");
+    if (servers.length > 0) {
+      const derived: SimulationFlowInput[] = [];
+      for (const sub of Object.values(aggregate.subnetsById)) {
+        if (sub.servedByDeviceId) {
+          for (const srv of servers) {
+            derived.push({
+              flowId: `flow-auto-${sub.id}-${srv.id}` as FlowId,
+              subnetId: sub.id,
+              sourceDeviceId: sub.servedByDeviceId,
+              destinationDeviceId: srv.id,
+              demandMbps: aggregate.project.settings.simulation.perHostDemandMbps * (sub.hostsRequired || 1),
+            });
+          }
+        }
+      }
+      flows = derived;
+    }
+  }
 
   const scenarios = aggregate.design.simulationSetup.failureScenarios.map((s) => ({
     scenarioId: s.id,

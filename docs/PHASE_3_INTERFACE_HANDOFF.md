@@ -173,3 +173,4 @@ export interface AnalysisStoreState {
 - If an input requirement changes, mark the displayed result as "Out of date" with explicit stale visual badges.
 - Cost prices are labeled as "Sample price / illustrative" where provenance is synthetic catalogue defaults.
 - All calculations work offline with locally saved IndexedDB inputs.
+
