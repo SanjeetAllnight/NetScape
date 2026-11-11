@@ -193,4 +193,33 @@ describe("WorkerClient Runtime (P1-06)", () => {
 
     await expect(handle.result).rejects.toThrow(/grid resolution exceeds/i);
   });
+
+  it("ignores stale response arriving for an already cancelled request", async () => {
+    let mockWorkerInstance!: MockWorker;
+    const client = new DefaultWorkerClient(() => {
+      mockWorkerInstance = new MockWorker();
+      return mockWorkerInstance;
+    });
+
+    const handle = client.run("coverage.compute", dummyCoverageInput, dummyStamp);
+    await client.cancel(handle.requestId);
+
+    mockWorkerInstance.simulateMessage({
+      protocolVersion: 1,
+      requestId: handle.requestId,
+      type: "cancelled",
+    });
+
+    await expect(handle.result).rejects.toThrow(/cancelled/i);
+
+    // Stale success message arrives after cancellation
+    expect(() => {
+      mockWorkerInstance.simulateMessage({
+        protocolVersion: 1,
+        requestId: handle.requestId,
+        type: "success",
+        result: {} as never,
+      });
+    }).not.toThrow();
+  });
 });

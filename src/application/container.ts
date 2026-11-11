@@ -22,6 +22,7 @@ import { WebCryptoHashService } from "@/application/hashService";
 import { SessionManager, DefaultDesignSession } from "@/application/session";
 import { DefaultProjectService } from "@/application/services/ProjectService";
 import { DefaultAddressingService } from "@/application/services/AddressingService";
+import { DefaultReportService, type ReportService } from "@/application/services/ReportService";
 import { NominatimGeocodingService } from "@/services/geocoding/NominatimGeocodingService";
 import { OSM_TILE_SOURCE } from "@/services/map/TileSourceConfig";
 import { DefaultAnalysisCoordinator } from "@/application/analysisCoordinator";
@@ -35,6 +36,7 @@ export interface ApplicationContainer {
   readonly designSession: DefaultDesignSession;
   readonly projectService: ProjectService;
   readonly addressingService: DefaultAddressingService;
+  readonly reportService: ReportService;
   readonly geocodingService: GeocodingService;
   readonly tileSourceConfig: TileSourceConfig;
   readonly analysisCoordinator: AnalysisCoordinator;
@@ -62,6 +64,7 @@ export function createApplicationContainer(options: ContainerOptions = {}): Appl
   const geocodingService = options.geocodingService ?? new NominatimGeocodingService();
   const tileSourceConfig = options.tileSourceConfig ?? OSM_TILE_SOURCE;
   const analysisCoordinator = new DefaultAnalysisCoordinator(repos, workerClient, hashService);
+  const reportService = new DefaultReportService(repos, analysisCoordinator);
 
   return {
     db,
@@ -72,6 +75,7 @@ export function createApplicationContainer(options: ContainerOptions = {}): Appl
     designSession,
     projectService,
     addressingService,
+    reportService,
     geocodingService,
     tileSourceConfig,
     analysisCoordinator,

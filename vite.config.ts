@@ -31,9 +31,23 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json,woff,woff2}"],
+        navigateFallback: "index.html",
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-pdf": ["jspdf", "jspdf-autotable"],
+          "vendor-leaflet": ["leaflet"],
+          "vendor-icons": ["lucide-react"],
+          "vendor-db": ["dexie"],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

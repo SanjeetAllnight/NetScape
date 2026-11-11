@@ -5,6 +5,7 @@ import { DexieRepositories } from "@/storage/repositories/dexieRepositories";
 import { seedBuiltinCatalog } from "@/storage/seed";
 import { DefaultProjectService } from "@/application/services/ProjectService";
 import { DefaultAddressingService } from "@/application/services/AddressingService";
+import { DefaultReportService } from "@/application/services/ReportService";
 import { DefaultDesignSession } from "@/application/session/DesignSession";
 import { DefaultAnalysisCoordinator } from "@/application/analysisCoordinator";
 import { DefaultWorkerClient } from "@/workers/WorkerClient";
@@ -227,6 +228,7 @@ describe("Phase 3 Analysis Modules & Design Comparison (Exit Gate 20 Scenarios)"
       designSession: session,
       projectService,
       addressingService: new DefaultAddressingService(repos, session),
+      reportService: new DefaultReportService(repos, coordinator),
       geocodingService: null as never,
       tileSourceConfig: null as never,
       analysisCoordinator: coordinator,

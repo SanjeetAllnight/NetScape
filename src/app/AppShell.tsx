@@ -1,15 +1,34 @@
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Network, Database, Settings, ShieldAlert } from "lucide-react";
+import { Network, Database, Settings, ShieldAlert, Wifi, WifiOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { UpdatePrompt } from "@/features/shell/UpdatePrompt";
 
 export function AppShell() {
   const location = useLocation();
   const isWorkspace = location.pathname.includes("/designs/");
 
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== "undefined" ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   if (isWorkspace) {
     return (
       <div className="h-screen w-screen flex flex-col bg-surface-canvas text-text-primary overflow-hidden">
         <Outlet />
+        <UpdatePrompt />
       </div>
     );
   }
@@ -30,48 +49,76 @@ export function AppShell() {
           </span>
         </div>
 
-        <nav className="flex items-center space-x-1 sm:space-x-2">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                isActive
-                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
-              }`
+        <div className="flex items-center space-x-3">
+          {/* Online / Offline status badge */}
+          <div
+            title={
+              isOnline
+                ? "Online — search & basemap tiles available"
+                : "Offline — local edits and calculations remain fully available"
             }
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-medium transition-colors ${
+              isOnline
+                ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
+                : "text-amber-400 border-amber-500/30 bg-amber-500/10"
+            }`}
           >
-            <Network className="w-3.5 h-3.5" />
-            Projects
-          </NavLink>
-          <NavLink
-            to="/catalog"
-            className={({ isActive }) =>
-              `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                isActive
-                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
-              }`
-            }
-          >
-            <Database className="w-3.5 h-3.5" />
-            Catalog
-          </NavLink>
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                isActive
-                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
-              }`
-            }
-          >
-            <Settings className="w-3.5 h-3.5" />
-            Settings
-          </NavLink>
-        </nav>
+            {isOnline ? (
+              <>
+                <Wifi className="w-3 h-3 text-emerald-400" />
+                <span className="hidden sm:inline">Online</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="w-3 h-3 text-amber-400" />
+                <span>Offline — local mode</span>
+              </>
+            )}
+          </div>
+
+          <nav className="flex items-center space-x-1 sm:space-x-2">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
+                  isActive
+                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                }`
+              }
+            >
+              <Network className="w-3.5 h-3.5" />
+              Projects
+            </NavLink>
+            <NavLink
+              to="/catalog"
+              className={({ isActive }) =>
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
+                  isActive
+                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                }`
+              }
+            >
+              <Database className="w-3.5 h-3.5" />
+              Catalog
+            </NavLink>
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
+                  isActive
+                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                }`
+              }
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Settings
+            </NavLink>
+          </nav>
+        </div>
       </header>
 
       {/* Phase 0 Status Banner */}
@@ -95,6 +142,8 @@ export function AppShell() {
       <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
+
+      <UpdatePrompt />
     </div>
   );
 }

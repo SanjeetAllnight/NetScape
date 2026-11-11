@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FolderPlus, Network, Copy, Trash2, Calendar, MapPin, Loader2, ArrowRight } from "lucide-react";
+import { FolderPlus, Network, Copy, Trash2, Calendar, MapPin, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getApplicationContainer } from "@/application/container";
 import { CreateProjectModal } from "./CreateProjectModal";
+import { loadDemoProject } from "@/demo/demoProject";
 import type { Project } from "@/contracts/domain";
 
 export function ProjectsView() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -36,6 +38,24 @@ export function ProjectsView() {
 
   const handleCreated = (projectId: string, baselineDesignId: string) => {
     navigate(`/projects/${projectId}/designs/${baselineDesignId}/map`);
+  };
+
+  const handleLoadDemo = async () => {
+    setIsLoadingDemo(true);
+    setError(null);
+    try {
+      const container = getApplicationContainer();
+      const { projectId, baselineDesignId } = await loadDemoProject(
+        container.projectService,
+        container.repos
+      );
+      await loadProjects();
+      navigate(`/projects/${projectId}/designs/${baselineDesignId}/map`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load demo project");
+    } finally {
+      setIsLoadingDemo(false);
+    }
   };
 
   const handleDuplicate = async (project: Project) => {
@@ -78,15 +98,31 @@ export function ProjectsView() {
             Local-first network design workstation. All data is persisted directly in your browser.
           </p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          variant="primary"
-          size="md"
-          className="gap-2 shadow-lg shadow-brand-electric/10"
-        >
-          <FolderPlus className="w-4 h-4" />
-          New Project
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleLoadDemo}
+            disabled={isLoadingDemo}
+            variant="secondary"
+            size="md"
+            className="gap-2 border-accent-blue/30 text-accent-blue hover:bg-accent-blue/10 transition-colors"
+          >
+            {isLoadingDemo ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 text-accent-blue" />
+            )}
+            Load Demo Project
+          </Button>
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            variant="primary"
+            size="md"
+            className="gap-2 shadow-lg shadow-brand-electric/10"
+          >
+            <FolderPlus className="w-4 h-4" />
+            New Project
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -110,10 +146,26 @@ export function ProjectsView() {
           <p className="text-xs text-text-muted max-w-sm mt-1 mb-6">
             Get started by creating your first network infrastructure planning project.
           </p>
-          <Button onClick={() => setIsModalOpen(true)} variant="primary" size="sm" className="gap-2">
-            <FolderPlus className="w-4 h-4" />
-            Create First Project
-          </Button>
+          <div className="flex items-center gap-3 mt-1 mb-6">
+            <Button
+              onClick={handleLoadDemo}
+              disabled={isLoadingDemo}
+              variant="secondary"
+              size="sm"
+              className="gap-1.5 border-accent-blue/30 text-accent-blue hover:bg-accent-blue/10"
+            >
+              {isLoadingDemo ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-accent-blue" />
+              )}
+              Load Demo Project
+            </Button>
+            <Button onClick={() => setIsModalOpen(true)} variant="primary" size="sm" className="gap-2">
+              <FolderPlus className="w-4 h-4" />
+              Create First Project
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

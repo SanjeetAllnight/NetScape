@@ -11,7 +11,7 @@ import { TopologyView } from "@/features/topology/TopologyView";
 import { AddressingView } from "@/features/addressing/AddressingView";
 import { CostView } from "@/features/cost/CostView";
 import { SimulationView } from "@/features/simulation/SimulationView";
-import { ReportPlaceholder } from "@/features/reports/ReportPlaceholder";
+import { ReportView } from "@/features/reports/ReportView";
 import { ComparisonView } from "@/features/comparison/ComparisonView";
 
 export const router = createHashRouter([
@@ -62,7 +62,7 @@ export const router = createHashRouter([
       },
       {
         path: "projects/:projectId/designs/:designId/report",
-        element: <ReportPlaceholder />,
+        element: <ReportView />,
       },
       {
         path: "projects/:projectId/compare",

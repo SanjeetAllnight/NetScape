@@ -778,7 +778,10 @@ export class DexieRepositories implements Repositories {
     clearDerivedCache: async (
       projectId?: ProjectId
     ): Promise<{ deletedRecords: number; deletedBlobs: number }> => {
-      return this.db.transaction("rw", [this.db.analysisCache, this.db.analysisBlobs], async () => {
+      return this.db.transaction(
+        "rw",
+        [this.db.designs, this.db.analysisCache, this.db.analysisBlobs],
+        async () => {
         if (!projectId) {
           const recCount = await this.db.analysisCache.count();
           const blobCount = await this.db.analysisBlobs.count();
