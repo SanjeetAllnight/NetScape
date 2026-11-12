@@ -11,3 +11,4 @@ export function useRegisterSW(_options?: unknown) {
     updateServiceWorker,
   };
 }
+
