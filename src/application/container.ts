@@ -66,6 +66,9 @@ export function createApplicationContainer(options: ContainerOptions = {}): Appl
   const analysisCoordinator = new DefaultAnalysisCoordinator(repos, workerClient, hashService);
   const reportService = new DefaultReportService(repos, analysisCoordinator);
 
+  // Proactively seed built-in hardware catalogue in the background
+  repos.catalog.seedBuiltIns(1, []).catch(() => {});
+
   return {
     db,
     repos,

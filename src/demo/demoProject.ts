@@ -46,6 +46,9 @@ export async function loadDemoProject(
   projectService: ProjectService,
   repos: Repositories
 ): Promise<{ projectId: ProjectId; baselineDesignId: DesignId }> {
+  // Ensure built-in hardware catalogue is seeded
+  await repos.catalog.seedBuiltIns(1, []);
+
   const centerLng = 77.5665;
   const centerLat = 13.0165;
 

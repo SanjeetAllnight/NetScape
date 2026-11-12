@@ -599,7 +599,12 @@ export async function generateEngineeringReportPdf(
   addSectionHeader("8. Engineering Assumptions & Disclaimers");
 
   const assumptionsData: [string, string][] = [
-    ["Electricity Tariff Rate", `INR ${report.assumptions.cost.electricityTariffPerKwh} / kWh`],
+    [
+      "Electricity Tariff Rate",
+      report.assumptions.cost.electricityTariffPerKwh
+        ? `${report.assumptions.cost.electricityTariffPerKwh.currency} ${report.assumptions.cost.electricityTariffPerKwh.amount} / kWh`
+        : "N/A",
+    ],
     ["TCO Evaluation Horizon", `${report.assumptions.cost.tcoHorizonYears} Years`],
     ["Device Power Duty Cycle", "100% Continuous Nameplate Consumption (Fixed Assumption)"],
     ["Propagation Speed in Medium", "200,000 km/s (Nominal 2.0 × 10^8 m/s)"],
