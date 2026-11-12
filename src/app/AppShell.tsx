@@ -57,11 +57,10 @@ export function AppShell() {
                 ? "Online — search & basemap tiles available"
                 : "Offline — local edits and calculations remain fully available"
             }
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-medium transition-colors ${
-              isOnline
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-medium transition-colors ${isOnline
                 ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
                 : "text-amber-400 border-amber-500/30 bg-amber-500/10"
-            }`}
+              }`}
           >
             {isOnline ? (
               <>
@@ -81,10 +80,9 @@ export function AppShell() {
               to="/"
               end
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
@@ -94,10 +92,9 @@ export function AppShell() {
             <NavLink
               to="/catalog"
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
@@ -107,10 +104,9 @@ export function AppShell() {
             <NavLink
               to="/settings"
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-surface-elevated text-brand-electric border border-border-strong"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
