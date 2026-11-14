@@ -146,3 +146,4 @@ High-resolution browser screenshots were captured across both target desktop res
    - Contrast ratio for Electric Violet (`#A78BFA`) against Carbon (`#121218`) is **6.2:1** (exceeding WCAG AA 4.5:1).
    - Soft White text (`#EAEAF2`) achieves **14.8:1**.
    - Keyboard navigation is fully supported across all modals, toolbars, and the Command Palette.
+
