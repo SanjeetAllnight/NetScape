@@ -299,7 +299,7 @@ export function ComparisonView() {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-surface-canvas text-text-secondary text-sm">
-        <RefreshCw className="w-5 h-5 animate-spin mr-2 text-brand-electric" />
+        <RefreshCw className="w-5 h-5 animate-spin mr-2 text-violet" />
         Loading designs and cached analyses...
       </div>
     );
@@ -308,21 +308,37 @@ export function ComparisonView() {
   // Single Design Guard
   if (designs.length <= 1) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-surface-canvas p-8 text-center">
-        <div className="w-12 h-12 rounded-xl bg-brand-electric/10 text-brand-electric flex items-center justify-center mb-4">
-          <GitCompare className="w-6 h-6" />
+      <div className="flex-1 flex flex-col h-full bg-surface-canvas">
+        <div className="border-b border-border-subtle bg-surface-panel/80 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <GitCompare className="w-5 h-5 text-violet" />
+            <h1 className="text-sm font-semibold text-text-primary">Design Comparison</h1>
+          </div>
+          {designs[0] && (
+            <Link
+              to={`/projects/${projectId}/designs/${designs[0].id}/map`}
+              className="px-3 py-1.5 rounded-lg border border-border-strong text-text-secondary hover:text-text-primary text-xs font-medium flex items-center gap-1.5"
+            >
+              Back to Design Workspace
+            </Link>
+          )}
         </div>
-        <h2 className="text-base font-semibold text-text-primary">Design Comparison Requires Multiple Designs</h2>
-        <p className="mt-2 text-xs text-text-muted max-w-md">
-          This project currently has only one design ({designs[0]?.name ?? "Baseline"}). To evaluate trade-offs in cost, RF coverage, and network simulation, duplicate the baseline to create an alternative design.
-        </p>
-        <button
-          onClick={handleDuplicateToCompare}
-          className="mt-6 px-4 py-2 rounded-lg bg-brand-electric text-text-inverse text-xs font-semibold hover:bg-brand-electric/90 shadow-sm flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Duplicate Design to Compare
-        </button>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+          <div className="w-12 h-12 rounded-xl bg-violet/10 text-violet flex items-center justify-center mb-4">
+            <GitCompare className="w-6 h-6" />
+          </div>
+          <h2 className="text-base font-semibold text-text-primary">Design Comparison Requires Multiple Designs</h2>
+          <p className="mt-2 text-xs text-text-muted max-w-md">
+            This project currently has only one design ({designs[0]?.name ?? "Baseline"}). To evaluate trade-offs in cost, RF coverage, and network simulation, duplicate the baseline to create an alternative design.
+          </p>
+          <button
+            onClick={handleDuplicateToCompare}
+            className="mt-6 px-4 py-2 rounded-lg bg-violet text-carbon-deep text-xs font-semibold hover:bg-violet-hover shadow-sm flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Duplicate Design to Compare
+          </button>
+        </div>
       </div>
     );
   }
@@ -336,7 +352,7 @@ export function ComparisonView() {
       <div className="border-b border-border-subtle bg-surface-panel/80 px-6 py-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GitCompare className="w-5 h-5 text-brand-electric" />
+            <GitCompare className="w-5 h-5 text-violet" />
             <div>
               <h1 className="text-sm font-semibold text-text-primary flex items-center gap-2">
                 Design Comparison
@@ -374,7 +390,7 @@ export function ComparisonView() {
         <div className="grid grid-cols-2 gap-6 bg-surface-canvas/60 p-3 rounded-lg border border-border-subtle">
           {/* Design A Selector */}
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-brand-electric w-16">Design A:</span>
+            <span className="text-xs font-bold text-violet w-16">Design A:</span>
             <select
               value={selectedDesignIdA ?? ""}
               onChange={(e) => handleSelectA(e.target.value as DesignId)}
@@ -387,7 +403,7 @@ export function ComparisonView() {
               ))}
             </select>
             {designA?.isBaseline && (
-              <span className="text-[10px] bg-brand-electric/15 text-brand-electric px-2 py-0.5 rounded font-medium border border-brand-electric/30">
+              <span className="text-[10px] bg-violet/15 text-violet px-2 py-0.5 rounded font-medium border border-violet/30">
                 Baseline
               </span>
             )}
@@ -395,7 +411,7 @@ export function ComparisonView() {
 
           {/* Design B Selector */}
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-accent-cyan w-16">Design B:</span>
+            <span className="text-xs font-bold text-[#38BDF8] w-16">Design B:</span>
             <select
               value={selectedDesignIdB ?? ""}
               onChange={(e) => handleSelectB(e.target.value as DesignId)}
@@ -408,7 +424,7 @@ export function ComparisonView() {
               ))}
             </select>
             {designB?.isBaseline && (
-              <span className="text-[10px] bg-brand-electric/15 text-brand-electric px-2 py-0.5 rounded font-medium border border-brand-electric/30">
+              <span className="text-[10px] bg-violet/15 text-violet px-2 py-0.5 rounded font-medium border border-violet/30">
                 Baseline
               </span>
             )}
@@ -429,7 +445,7 @@ export function ComparisonView() {
         <div className="rounded-lg border border-border-subtle bg-surface-panel/40 overflow-hidden">
           <div className="px-4 py-3 bg-surface-panel border-b border-border-subtle flex items-center justify-between">
             <span className="text-xs font-semibold text-text-primary flex items-center gap-2">
-              <Layers className="w-4 h-4 text-brand-electric" />
+              <Layers className="w-4 h-4 text-violet" />
               1. Structural Equipment & Connectivity Diff
             </span>
             <span className="text-[11px] text-text-muted">
@@ -508,7 +524,7 @@ export function ComparisonView() {
         <div className="rounded-lg border border-border-subtle bg-surface-panel/40 overflow-hidden">
           <div className="px-4 py-3 bg-surface-panel border-b border-border-subtle flex items-center justify-between">
             <span className="text-xs font-semibold text-text-primary flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-brand-electric" />
+              <DollarSign className="w-4 h-4 text-violet" />
               2. Cost Estimation (CAPEX, OPEX, TCO)
             </span>
             <div className="flex items-center gap-3">
@@ -516,7 +532,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("A", "cost")}
                   disabled={runningAnalysis === "A:cost"}
-                  className="px-2.5 py-1 rounded bg-brand-electric/15 text-brand-electric hover:bg-brand-electric/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-violet/15 text-violet hover:bg-violet/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "A:cost" ? "animate-spin" : ""}`} />
                   Run Cost for A
@@ -526,7 +542,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("B", "cost")}
                   disabled={runningAnalysis === "B:cost"}
-                  className="px-2.5 py-1 rounded bg-accent-cyan/15 text-accent-cyan hover:bg-accent-cyan/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-[#38BDF8]/15 text-[#38BDF8] hover:bg-[#38BDF8]/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "B:cost" ? "animate-spin" : ""}`} />
                   Run Cost for B
@@ -548,7 +564,7 @@ export function ComparisonView() {
         <div className="rounded-lg border border-border-subtle bg-surface-panel/40 overflow-hidden">
           <div className="px-4 py-3 bg-surface-panel border-b border-border-subtle flex items-center justify-between">
             <span className="text-xs font-semibold text-text-primary flex items-center gap-2">
-              <Wifi className="w-4 h-4 text-brand-electric" />
+              <Wifi className="w-4 h-4 text-violet" />
               3. Wireless RF Coverage & Dead Zones
             </span>
             <div className="flex items-center gap-3">
@@ -556,7 +572,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("A", "coverage")}
                   disabled={runningAnalysis === "A:coverage"}
-                  className="px-2.5 py-1 rounded bg-brand-electric/15 text-brand-electric hover:bg-brand-electric/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-violet/15 text-violet hover:bg-violet/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "A:coverage" ? "animate-spin" : ""}`} />
                   Run Coverage for A
@@ -566,7 +582,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("B", "coverage")}
                   disabled={runningAnalysis === "B:coverage"}
-                  className="px-2.5 py-1 rounded bg-accent-cyan/15 text-accent-cyan hover:bg-accent-cyan/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-[#38BDF8]/15 text-[#38BDF8] hover:bg-[#38BDF8]/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "B:coverage" ? "animate-spin" : ""}`} />
                   Run Coverage for B
@@ -596,7 +612,7 @@ export function ComparisonView() {
         <div className="rounded-lg border border-border-subtle bg-surface-panel/40 overflow-hidden">
           <div className="px-4 py-3 bg-surface-panel border-b border-border-subtle flex items-center justify-between">
             <span className="text-xs font-semibold text-text-primary flex items-center gap-2">
-              <Activity className="w-4 h-4 text-brand-electric" />
+              <Activity className="w-4 h-4 text-violet" />
               4. Network Simulation Performance (Baseline)
             </span>
             <div className="flex items-center gap-3">
@@ -604,7 +620,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("A", "simulation")}
                   disabled={runningAnalysis === "A:simulation"}
-                  className="px-2.5 py-1 rounded bg-brand-electric/15 text-brand-electric hover:bg-brand-electric/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-violet/15 text-violet hover:bg-violet/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "A:simulation" ? "animate-spin" : ""}`} />
                   Run Simulation for A
@@ -614,7 +630,7 @@ export function ComparisonView() {
                 <button
                   onClick={() => handleRunAnalysis("B", "simulation")}
                   disabled={runningAnalysis === "B:simulation"}
-                  className="px-2.5 py-1 rounded bg-accent-cyan/15 text-accent-cyan hover:bg-accent-cyan/25 text-[11px] font-medium flex items-center gap-1"
+                  className="px-2.5 py-1 rounded bg-[#38BDF8]/15 text-[#38BDF8] hover:bg-[#38BDF8]/25 text-[11px] font-medium flex items-center gap-1"
                 >
                   <RefreshCw className={`w-3 h-3 ${runningAnalysis === "B:simulation" ? "animate-spin" : ""}`} />
                   Run Simulation for B
@@ -693,7 +709,7 @@ function MetricComparisonTable({ metrics, formatValue, formatDelta }: MetricTabl
                     </span>
                   )}
                   {isBetterA && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-brand-electric bg-brand-electric/10 px-2 py-0.5 rounded border border-brand-electric/30">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-violet bg-violet/10 px-2 py-0.5 rounded border border-violet/30">
                       Design A
                     </span>
                   )}

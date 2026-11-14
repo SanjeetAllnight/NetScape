@@ -76,11 +76,11 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-surface-raised border border-border-strong rounded-lg shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-lg bg-surface-raised border border-border-strong rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-brand-electric" />
+            <Sliders className="w-4 h-4 text-violet" />
             <h2 className="text-base font-semibold text-text-primary">Project Engineering Settings</h2>
           </div>
           <button
@@ -97,7 +97,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
             onClick={() => setActiveTab("cost")}
             className={`pb-2 border-b-2 transition-colors ${
               activeTab === "cost"
-                ? "border-brand-electric text-brand-electric"
+                ? "border-violet text-violet"
                 : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -107,7 +107,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
             onClick={() => setActiveTab("coverage")}
             className={`pb-2 border-b-2 transition-colors ${
               activeTab === "coverage"
-                ? "border-brand-electric text-brand-electric"
+                ? "border-violet text-violet"
                 : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -117,7 +117,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
             onClick={() => setActiveTab("simulation")}
             className={`pb-2 border-b-2 transition-colors ${
               activeTab === "simulation"
-                ? "border-brand-electric text-brand-electric"
+                ? "border-violet text-violet"
                 : "border-transparent text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -139,7 +139,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     step="1"
                     value={cableSlackPct}
                     onChange={(e) => setCableSlackPct(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
                 <div>
@@ -151,7 +151,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     step="0.5"
                     value={maintenancePct}
                     onChange={(e) => setMaintenancePct(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
               </div>
@@ -166,7 +166,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     step="0.5"
                     value={contingencyPct}
                     onChange={(e) => setContingencyPct(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
                 <div>
@@ -177,7 +177,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     max="20"
                     value={tcoHorizonYears}
                     onChange={(e) => setTcoHorizonYears(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
               </div>
@@ -199,7 +199,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     max="50"
                     value={gridResolutionM}
                     onChange={(e) => setGridResolutionM(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
                 <div>
@@ -211,7 +211,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                     step="0.1"
                     value={pathLossExponent}
                     onChange={(e) => setPathLossExponent(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                    className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                   />
                 </div>
               </div>
@@ -224,7 +224,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                   max="-40"
                   value={minRssi}
                   onChange={(e) => setMinRssi(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                  className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                 />
               </div>
 
@@ -245,7 +245,7 @@ export function ProjectSettingsModal({ isOpen, onClose }: ProjectSettingsModalPr
                   step="0.5"
                   value={perHostDemandMbps}
                   onChange={(e) => setPerHostDemandMbps(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-brand-electric focus:outline-none"
+                  className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary font-mono focus:border-violet focus:outline-none"
                 />
               </div>
 

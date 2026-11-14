@@ -69,11 +69,11 @@ export function TemplateModal({ isOpen, onClose }: TemplateModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-surface-raised border border-border-strong rounded-lg shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-md bg-surface-raised border border-border-strong rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-brand-cantaloupe" />
+            <Sparkles className="w-4 h-4 text-violet" />
             <h2 className="text-base font-semibold text-text-primary">Topology Template</h2>
           </div>
           <button
@@ -101,7 +101,7 @@ export function TemplateModal({ isOpen, onClose }: TemplateModalProps) {
                 onClick={() => setKind("star")}
                 className={`flex-1 py-1.5 px-3 rounded text-center border font-medium transition-colors ${
                   kind === "star"
-                    ? "bg-brand-electric text-white border-brand-electric"
+                    ? "bg-violet text-carbon-deep font-semibold border-violet"
                     : "bg-surface-panel border-border-subtle text-text-secondary hover:text-text-primary"
                 }`}
               >
@@ -116,7 +116,7 @@ export function TemplateModal({ isOpen, onClose }: TemplateModalProps) {
             <select
               value={rootDeviceId}
               onChange={(e) => setRootDeviceId(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none"
+              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-violet focus:outline-none"
             >
               {devices.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -132,7 +132,7 @@ export function TemplateModal({ isOpen, onClose }: TemplateModalProps) {
             <select
               value={medium}
               onChange={(e) => setMedium(e.target.value as LinkMedium)}
-              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none"
+              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-violet focus:outline-none"
             >
               <option value="copper">Copper Ethernet</option>
               <option value="fiber">Optical Fibre</option>
@@ -157,7 +157,7 @@ export function TemplateModal({ isOpen, onClose }: TemplateModalProps) {
                       type="checkbox"
                       checked={selectedMemberIds.includes(d.id)}
                       onChange={() => handleToggleMember(d.id)}
-                      className="rounded border-border-strong text-brand-electric focus:ring-0"
+                      className="rounded border-border-strong text-violet focus:ring-0"
                     />
                     <span className="text-text-primary font-medium">{d.name}</span>
                     <span className="text-text-muted text-[10px]">({d.type})</span>
