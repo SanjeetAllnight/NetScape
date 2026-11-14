@@ -3,29 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --color-brand-midnight: #02070A;
-  --color-brand-electric: #0297DE;
-  --color-brand-cantaloupe: #FC734D;
+  --color-carbon-deep: #0B0B10;
+  --color-carbon: #121218;
+  --color-slate-panel: #242430;
+  --color-slate-elevated: #30303D;
+  --color-slate-muted: #858596;
 
-  --color-surface-canvas: #02070A;
-  --color-surface-raised: #071117;
-  --color-surface-panel: #0A171E;
-  --color-surface-elevated: #10212A;
-  --color-surface-input: #08131A;
+  --color-violet: #A78BFA;
+  --color-violet-hover: #B9A4FF;
+  --color-violet-tint: rgba(167, 139, 250, 0.12);
 
-  --color-border-subtle: #172A34;
-  --color-border-strong: #29414D;
+  --color-brand-midnight: #0B0B10;
+  --color-brand-electric: #A78BFA;
+  --color-brand-cantaloupe: #F59E0B;
 
-  --color-text-primary: #E7F0F4;
-  --color-text-secondary: #9AAEB8;
-  --color-text-muted: #6F858F;
-  --color-text-disabled: #4B606A;
+  --color-surface-canvas: #121218;
+  --color-surface-deep: #0B0B10;
+  --color-surface-raised: #242430;
+  --color-surface-panel: #242430;
+  --color-surface-elevated: #30303D;
+  --color-surface-input: #1A1A24;
 
-  --color-status-success: #35A879;
-  --color-status-warning: #E4AD4C;
-  --color-status-error: #E05A5A;
-  --color-status-info: #0297DE;
-  --color-status-stale: #FC734D;
+  --color-border-subtle: #2A2A38;
+  --color-border-strong: #3E3E50;
+
+  --color-text-primary: #EAEAF2;
+  --color-text-secondary: #858596;
+  --color-text-muted: #6B6B7E;
+  --color-text-disabled: #4B4B5A;
+
+  --color-status-success: #10B981;
+  --color-status-warning: #F59E0B;
+  --color-status-error: #EF4444;
+  --color-status-info: #38BDF8;
+  --color-status-stale: #F59E0B;
 }
 
 body {
@@ -40,3 +51,36 @@ code, kbd, samp, pre {
   font-family: "Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* Slim CAD/Engineering Dark Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3E3E50 #121218;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121218;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30303D;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3E3E50;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

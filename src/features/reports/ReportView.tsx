@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  ArrowLeft,
   Loader2,
   RefreshCw,
   Info,
@@ -18,6 +17,8 @@ import {
   Activity,
   DollarSign,
 } from "lucide-react";
+import { WorkbenchHeader } from "@/features/shell/WorkbenchHeader";
+import { AnalysisStatusStrip } from "@/features/shell/AnalysisStatusStrip";
 import { getApplicationContainer } from "@/application/container";
 import type { ReportModel } from "@/contracts/reports";
 import type { AnalysisBlob } from "@/contracts/engines";
@@ -169,81 +170,28 @@ export function ReportView() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-canvas text-text-primary">
-      {/* Top Header Bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border-default bg-surface-panel px-6">
-        <div className="flex items-center gap-4">
-          <Link
-            to={`/projects/${projectId}/designs/${designId}/map`}
-            className="flex items-center gap-1 text-xs font-medium text-text-secondary hover:text-text-primary"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Workspace
-          </Link>
-          <div className="h-4 w-px bg-border-strong" />
+    <div className="flex h-screen w-full flex-col bg-surface-canvas text-text-primary select-none overflow-hidden">
+      <WorkbenchHeader />
+
+      {/* Report Sub-Header Bar */}
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-border-subtle bg-surface-panel/80 px-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <FileText className="h-4 w-4 text-violet" />
           <div>
-            <h1 className="flex items-center gap-2 text-sm font-bold text-text-primary">
-              <FileText className="h-4 w-4 text-accent-blue" />
-              Report Preview: {reportModel.project.name}
+            <h1 className="flex items-center gap-2 text-xs font-bold text-text-primary">
+              Engineering Report Preview: {reportModel.project.name}
             </h1>
-            <p className="text-[11px] text-text-secondary">
+            <p className="text-[10px] text-text-muted font-mono">
               Design: {reportModel.design.name} (Rev {reportModel.design.revision})
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Status strip */}
-          <div className="hidden items-center gap-3 text-xs sm:flex">
-            <span className="text-[11px] text-text-muted">Analysis Status:</span>
-            <span className="flex items-center gap-1 text-[11px] text-text-secondary">
-              Cost:{" "}
-              <span
-                className={`font-semibold ${
-                  reportModel.cost.status === "current"
-                    ? "text-emerald-400"
-                    : reportModel.cost.status === "outOfDate"
-                    ? "text-amber-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {reportModel.cost.status}
-              </span>
-            </span>
-            <span className="flex items-center gap-1 text-[11px] text-text-secondary">
-              Coverage:{" "}
-              <span
-                className={`font-semibold ${
-                  reportModel.coverage.status === "current"
-                    ? "text-emerald-400"
-                    : reportModel.coverage.status === "outOfDate"
-                    ? "text-amber-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {reportModel.coverage.status}
-              </span>
-            </span>
-            <span className="flex items-center gap-1 text-[11px] text-text-secondary">
-              Simulation:{" "}
-              <span
-                className={`font-semibold ${
-                  reportModel.simulation.status === "current"
-                    ? "text-emerald-400"
-                    : reportModel.simulation.status === "outOfDate"
-                    ? "text-amber-400"
-                    : "text-slate-400"
-                }`}
-              >
-                {reportModel.simulation.status}
-              </span>
-            </span>
-          </div>
-
           <button
             onClick={handleDownloadPdf}
             disabled={isGeneratingPdf}
-            className="flex items-center gap-2 rounded bg-accent-blue px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-accent-blue-hover disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-violet px-4 py-1.5 text-xs font-semibold text-carbon-deep shadow-md transition hover:bg-violet-hover disabled:opacity-40"
           >
             {isGeneratingPdf ? (
               <>
@@ -782,6 +730,8 @@ export function ReportView() {
           </div>
         </main>
       </div>
+
+      <AnalysisStatusStrip />
     </div>
   );
 }
