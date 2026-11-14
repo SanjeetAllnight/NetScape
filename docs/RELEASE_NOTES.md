@@ -1,7 +1,8 @@
-# NetScape — Release Notes (v1.0.0-rc1)
+# NetScape — Release Notes (v1.0.0)
 
-**Release:** NetScape MVP Release Candidate 1  
+**Release:** NetScape MVP Production Release (v1.0.0)  
 **Build Target:** Desktop-First Local-First Engineering Workstation  
+**Design Identity:** Concept A — Integrated Engineering Workbench (Carbon & Electric Violet)  
 **Date:** November 2026  
 **License:** MIT (Academic & Engineering Demonstration)  
 
@@ -85,6 +86,14 @@ With NetScape, network architects can plan physical cable runs, place wireless a
   9. Engineering Assumptions & Disclaimers
 - **Synthetic Vector Schematics:** Figures are drawn directly from domain geometry via 2D canvas renderers; live Leaflet map tiles are never screenshotted.
 - **Freshness Transparency:** Analysis sections explicitly display status badges (`[Current]`, `[Computed on an earlier version]`, or `[Not computed]`), preventing stale data ambiguity.
+
+### 3.10 Integrated Engineering Workbench (Concept A UI/UX)
+- **Carbon & Electric Violet Identity:** Authoritative workstation dark aesthetic featuring Carbon (`#121218`), Dark Slate (`#1A1A24`), and high-contrast Electric Violet (`#A78BFA`, 6.2:1 contrast ratio) primary accents with soft white text.
+- **Grouped 4-Phase Navigation:** Streamlined top workbench header categorizing workspaces into DESIGN (Map, Topology), PLAN (Addressing, Cost), ANALYSE (Coverage, Simulation), and DELIVER (Compare, Report).
+- **Unified Docked Inspector:** 360px right-hand collapsible dock shared across map, topology, subnet properties, BOM line items, and report sections.
+- **Bottom Analysis Truth Strip:** Docked 32px footer communicating genuine cryptographic freshness statuses (`Current`, `Out of date`, `Not calculated`) with immediate re-run triggers and expandable technical drawer.
+- **Global Command Palette (`Ctrl/Cmd + K`):** Rapid keyboard-driven workspace switching and layer toggling.
+- **Map + Topology Split View:** Synchronized dual-pane workspace enabling concurrent geographic and logical inspection with linked entity selection.
 
 ---
 
