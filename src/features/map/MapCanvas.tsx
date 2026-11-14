@@ -22,8 +22,8 @@ const OBSTACLE_STYLES: Record<ObstacleMaterial, { color: string; fillColor: stri
 
 // Device SVG Icons
 function getDeviceSvg(type: DeviceType, isSelected: boolean): string {
-  const stroke = isSelected ? "#B9A4FF" : "#A78BFA";
-  const bg = isSelected ? "#30303D" : "#242430";
+  const stroke = isSelected ? "#FC734D" : "#0297DE";
+  const bg = isSelected ? "#10212A" : "#071117";
   const size = 32;
 
   let iconInner = "";
@@ -43,10 +43,6 @@ function getDeviceSvg(type: DeviceType, isSelected: boolean): string {
                  <circle cx="10" cy="21" r="1" fill="${stroke}"/>`;
   }
 
-  const shadow = isSelected
-    ? "box-shadow: 0 0 0 2px #A78BFA, 0 4px 14px rgba(0,0,0,0.8);"
-    : "box-shadow: 0 4px 12px rgba(0,0,0,0.6);";
-
   return `
     <div style="
       width: ${size}px;
@@ -57,7 +53,7 @@ function getDeviceSvg(type: DeviceType, isSelected: boolean): string {
       background: ${bg};
       border: 2px solid ${stroke};
       border-radius: 8px;
-      ${shadow}
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       cursor: pointer;
     ">
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
@@ -395,11 +391,11 @@ export function MapCanvas() {
     );
 
     const boundaryPoly = L.polygon(latlngs, {
-      color: "#A78BFA",
+      color: "#0297DE",
       weight: 2,
       dashArray: "6, 8",
-      fillColor: "#A78BFA",
-      fillOpacity: 0.08,
+      fillColor: "#0297DE",
+      fillOpacity: 0.05,
       interactive: false,
     });
     group.addLayer(boundaryPoly);
@@ -461,17 +457,17 @@ export function MapCanvas() {
 
       const isSelected = selectedEntity?.type === "link" && selectedEntity.id === link.id;
 
-      let color = "#38BDF8"; // copper (sky)
+      let color = "#0297DE"; // copper
       let dashArray: string | undefined = undefined;
       if (link.medium === "fiber") {
-        color = "#F59E0B"; // optical fiber (amber)
+        color = "#FC734D";
       } else if (link.medium === "wireless") {
-        color = "#10B981"; // wireless (emerald)
+        color = "#35A879";
         dashArray = "6, 8";
       }
 
       const polyline = L.polyline(latlngs, {
-        color: isSelected ? "#A78BFA" : color,
+        color: isSelected ? "#FFFFFF" : color,
         weight: isSelected ? 4 : 2.5,
         dashArray,
         opacity: 0.9,
@@ -570,7 +566,7 @@ export function MapCanvas() {
       ref={mapContainerRef}
       className="w-full h-full relative outline-none bg-surface-canvas"
       style={{
-        backgroundImage: "radial-gradient(#2A2A38 1px, transparent 1px)",
+        backgroundImage: "radial-gradient(#172A34 1px, transparent 1px)",
         backgroundSize: "24px 24px",
       }}
     />

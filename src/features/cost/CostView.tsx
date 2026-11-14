@@ -16,7 +16,6 @@ import {
   Building,
 } from "lucide-react";
 import { ProjectHeader } from "@/features/shell/ProjectHeader";
-import { AnalysisStatusStrip } from "@/features/shell/AnalysisStatusStrip";
 import { useDesignStore } from "@/stores/designStore";
 import { useAnalysisStore } from "@/stores/analysisStore";
 import { getApplicationContainer } from "@/application/container";
@@ -95,16 +94,16 @@ export function CostView() {
     const labourAmount = estimate.byCategory.labour?.amount ?? 0;
 
     const capexBreakdown = [
-      { name: "Hardware", amount: hwAmount, color: "#A78BFA", pct: capex > 0 ? (hwAmount / capex) * 100 : 0 },
-      { name: "Cabling", amount: cablingAmount, color: "#38BDF8", pct: capex > 0 ? (cablingAmount / capex) * 100 : 0 },
-      { name: "Termination", amount: terminationAmount, color: "#818CF8", pct: capex > 0 ? (terminationAmount / capex) * 100 : 0 },
-      { name: "Civil Work", amount: civilAmount, color: "#F59E0B", pct: capex > 0 ? (civilAmount / capex) * 100 : 0 },
-      { name: "Labour", amount: labourAmount, color: "#EF4444", pct: capex > 0 ? (labourAmount / capex) * 100 : 0 },
+      { name: "Hardware", amount: hwAmount, color: "#0297DE", pct: capex > 0 ? (hwAmount / capex) * 100 : 0 },
+      { name: "Cabling", amount: cablingAmount, color: "#38bdf8", pct: capex > 0 ? (cablingAmount / capex) * 100 : 0 },
+      { name: "Termination", amount: terminationAmount, color: "#818cf8", pct: capex > 0 ? (terminationAmount / capex) * 100 : 0 },
+      { name: "Civil Work", amount: civilAmount, color: "#fbbf24", pct: capex > 0 ? (civilAmount / capex) * 100 : 0 },
+      { name: "Labour", amount: labourAmount, color: "#f87171", pct: capex > 0 ? (labourAmount / capex) * 100 : 0 },
     ].filter((item) => item.amount > 0);
 
     const tcoComparison = [
-      { name: "Initial CAPEX", amount: capex, color: "#A78BFA", pct: tco > 0 ? (capex / tco) * 100 : 0 },
-      { name: `${horizon}-Yr OPEX`, amount: opexTotal, color: "#F59E0B", pct: tco > 0 ? (opexTotal / tco) * 100 : 0 },
+      { name: "Initial CAPEX", amount: capex, color: "#0297DE", pct: tco > 0 ? (capex / tco) * 100 : 0 },
+      { name: `${horizon}-Yr OPEX`, amount: opexTotal, color: "#FC734D", pct: tco > 0 ? (opexTotal / tco) * 100 : 0 },
     ];
 
     return { capexBreakdown, tcoComparison };
@@ -141,7 +140,7 @@ export function CostView() {
             <button
               onClick={handleCalculate}
               disabled={isCalculating}
-              className="px-4 py-1.5 rounded-lg bg-violet hover:bg-violet-hover active:bg-violet-active disabled:opacity-40 text-carbon-deep text-xs font-semibold shadow-md flex items-center gap-1.5 transition-colors select-none"
+              className="px-4 py-1.5 rounded bg-brand-electric hover:bg-brand-electric/90 disabled:opacity-50 text-white text-xs font-semibold shadow flex items-center gap-1.5 transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isCalculating ? "animate-spin" : ""}`} />
               {isCalculating ? "Calculating..." : costRecord ? "Recalculate Estimate" : "Calculate Estimate"}
@@ -463,9 +462,6 @@ export function CostView() {
 
       {/* Settings Modal */}
       <ProjectSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-
-      {/* Persistent Analysis Status Strip */}
-      <AnalysisStatusStrip />
     </div>
   );
 }

@@ -1,19 +1,16 @@
 import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Network, Database, Settings, ShieldAlert, Wifi, WifiOff, Search } from "lucide-react";
+import { Network, Database, Settings, ShieldAlert, Wifi, WifiOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { UpdatePrompt } from "@/features/shell/UpdatePrompt";
-import { CommandPalette } from "@/features/shell/CommandPalette";
 
 export function AppShell() {
   const location = useLocation();
-  const isWorkspace =
-    location.pathname.includes("/designs/") || location.pathname.includes("/compare");
+  const isWorkspace = location.pathname.includes("/designs/");
 
   const [isOnline, setIsOnline] = useState(
     typeof navigator !== "undefined" ? navigator.onLine : true
   );
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -25,18 +22,6 @@ export function AppShell() {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
-
-  // Global Ctrl/Cmd + K shortcut listener for root shell
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setIsCommandPaletteOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   if (isWorkspace) {
@@ -53,30 +38,18 @@ export function AppShell() {
       {/* Top Header */}
       <header className="h-14 border-b border-border-subtle bg-surface-raised px-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded bg-carbon-deep border border-border-strong text-violet">
+          <div className="flex items-center justify-center w-8 h-8 rounded bg-brand-midnight border border-border-strong text-brand-electric">
             <Network className="w-5 h-5" />
           </div>
           <span className="font-semibold text-base tracking-tight text-text-primary">
             NetScape
           </span>
           <span className="text-xs text-text-muted hidden sm:inline">
-            Smart Map-Based Network Infrastructure Planning Workstation
+            Network Infrastructure Planning Workstation
           </span>
         </div>
 
         <div className="flex items-center space-x-3">
-          {/* Quick command search trigger */}
-          <button
-            onClick={() => setIsCommandPaletteOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-panel hover:bg-surface-elevated border border-border-subtle text-text-muted hover:text-text-primary text-xs transition-colors"
-          >
-            <Search className="w-3.5 h-3.5 text-violet" />
-            <span>Search commands...</span>
-            <kbd className="px-1.5 py-0.2 rounded border border-border-strong bg-surface-elevated text-[9px] font-mono text-text-muted">
-              Ctrl K
-            </kbd>
-          </button>
-
           {/* Online / Offline status badge */}
           <div
             title={
@@ -84,20 +57,19 @@ export function AppShell() {
                 ? "Online — search & basemap tiles available"
                 : "Offline — local edits and calculations remain fully available"
             }
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-medium transition-colors ${
-              isOnline
-                ? "text-status-success border-status-success/30 bg-status-success/10"
-                : "text-status-warning border-status-warning/30 bg-status-warning/10"
-            }`}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-medium transition-colors ${isOnline
+                ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
+                : "text-amber-400 border-amber-500/30 bg-amber-500/10"
+              }`}
           >
             {isOnline ? (
               <>
-                <Wifi className="w-3 h-3 text-status-success" />
+                <Wifi className="w-3 h-3 text-emerald-400" />
                 <span className="hidden sm:inline">Online</span>
               </>
             ) : (
               <>
-                <WifiOff className="w-3 h-3 text-status-warning" />
+                <WifiOff className="w-3 h-3 text-amber-400" />
                 <span>Offline — local mode</span>
               </>
             )}
@@ -108,10 +80,9 @@ export function AppShell() {
               to="/"
               end
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-violet/15 text-violet border border-violet/30"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
@@ -121,10 +92,9 @@ export function AppShell() {
             <NavLink
               to="/catalog"
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-violet/15 text-violet border border-violet/30"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
@@ -134,10 +104,9 @@ export function AppShell() {
             <NavLink
               to="/settings"
               className={({ isActive }) =>
-                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-violet/15 text-violet border border-violet/30"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
+                `px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5 ${isActive
+                  ? "bg-surface-elevated text-brand-electric border border-border-strong"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-panel"
                 }`
               }
             >
@@ -148,7 +117,7 @@ export function AppShell() {
         </div>
       </header>
 
-      {/* Engineering Baseline Status Banner */}
+      {/* Phase 0 Status Banner */}
       <div className="bg-surface-panel border-b border-border-subtle px-4 py-2 flex items-center justify-between text-xs">
         <div className="flex items-center space-x-2">
           <Badge variant="stale" className="gap-1 font-mono uppercase tracking-wider">
@@ -156,11 +125,12 @@ export function AppShell() {
             Phase 0
           </Badge>
           <span className="text-text-secondary">
-            Engineering Foundation Active — Pure local-first client architecture with Dexie IndexedDB persistence.
+            Engineering Foundation Active — Compile-time contracts and test seam only.
+            MVP product features are deferred to Phase 1+.
           </span>
         </div>
         <span className="text-text-muted font-mono text-[11px] hidden md:inline">
-          HashRouter • Web Workers • Zero Cloud Dependencies
+          HashRouter • Pure Kernel • Zero Backend
         </span>
       </div>
 
@@ -170,11 +140,7 @@ export function AppShell() {
       </main>
 
       <UpdatePrompt />
-
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-      />
     </div>
   );
 }
+

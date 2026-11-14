@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Search, MapPin, Loader2, Compass } from "lucide-react";
+import { X, Search, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getApplicationContainer } from "@/application/container";
 import { makeGeoPoint } from "@/domain/geo/localFrame";
@@ -94,26 +94,23 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-100">
-      <div className="w-full max-w-lg bg-surface-raised border border-border-strong rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-t-violet/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg bg-surface-raised border border-border-strong rounded-lg shadow-2xl flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between bg-surface-panel/70">
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-violet" />
-            <h2 className="text-sm font-bold text-text-primary">Create New Network Project</h2>
-          </div>
+        <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
+          <h2 className="text-base font-semibold text-text-primary">Create New Project</h2>
           <button
             onClick={onClose}
-            className="text-text-muted hover:text-text-primary p-1 rounded hover:bg-surface-elevated transition-colors"
+            className="text-text-muted hover:text-text-primary p-1 rounded hover:bg-surface-panel transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
           {error && (
-            <div className="p-3 rounded-lg bg-status-error/10 border border-status-error/30 text-status-error">
+            <div className="p-3 rounded bg-status-error/10 border border-status-error/30 text-status-error">
               {error}
             </div>
           )}
@@ -126,33 +123,31 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. South Campus Network Overhaul"
-              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none"
+              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block font-medium text-text-secondary mb-1">Description (Optional)</label>
+            <label className="block font-medium text-text-secondary mb-1">Description</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional notes or project scope definition"
-              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none resize-none"
+              placeholder="Optional notes or project scope"
+              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none resize-none"
             />
           </div>
 
           {/* Location Search Bar */}
           <div>
-            <label className="block font-medium text-text-secondary mb-1">
-              Geographic Region Origin (Search Online)
-            </label>
+            <label className="block font-medium text-text-secondary mb-1">Location Search (Online)</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search place, city, or address..."
-                className="flex-1 px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none"
+                className="flex-1 px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -167,12 +162,12 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
                 onClick={handleSearch}
                 disabled={isSearching || !searchQuery.trim()}
               >
-                {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4 text-violet" />}
+                {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               </Button>
             </div>
 
             {searchResults.length > 0 && (
-              <div className="mt-2 border border-border-strong rounded-lg bg-surface-panel max-h-40 overflow-y-auto divide-y divide-border-subtle shadow-xl">
+              <div className="mt-2 border border-border-strong rounded bg-surface-panel max-h-40 overflow-y-auto divide-y divide-border-subtle">
                 {searchResults.map((item, index) => (
                   <button
                     key={index}
@@ -180,7 +175,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
                     onClick={() => selectSearchResult(item)}
                     className="w-full text-left px-3 py-2 text-xs hover:bg-surface-elevated text-text-primary flex items-start gap-2"
                   >
-                    <MapPin className="w-3.5 h-3.5 mt-0.5 text-violet shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 mt-0.5 text-brand-electric shrink-0" />
                     <span className="truncate">{item.label}</span>
                   </button>
                 ))}
@@ -196,7 +191,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
                 required
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none font-mono"
+                className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none font-mono"
               />
             </div>
             <div>
@@ -206,7 +201,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
                 required
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none font-mono"
+                className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none font-mono"
               />
             </div>
           </div>
@@ -218,7 +213,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
               required
               value={regionLabel}
               onChange={(e) => setRegionLabel(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded-lg text-text-primary focus:border-violet focus:outline-none"
+              className="w-full px-3 py-2 bg-surface-input border border-border-subtle rounded text-text-primary focus:border-brand-electric focus:outline-none"
             />
           </div>
 
@@ -227,11 +222,11 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
             <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" size="sm" disabled={isSubmitting} className="font-semibold">
+            <Button type="submit" variant="primary" size="sm" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Creating Project...
+                  Creating...
                 </>
               ) : (
                 "Create Project"
@@ -243,3 +238,4 @@ export function CreateProjectModal({ isOpen, onClose, onCreated }: CreateProject
     </div>
   );
 }
+

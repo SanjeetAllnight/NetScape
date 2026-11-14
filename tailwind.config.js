@@ -5,59 +5,34 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Direct Carbon & Electric Violet Tokens
-        carbon: {
-          deep: "#0B0B10",
-          DEFAULT: "#121218",
-          elevated: "#181822",
-        },
-        slate: {
-          dark: "#242430",
-          panel: "#242430",
-          elevated: "#30303D",
-          muted: "#858596",
-          subtle: "#1A1A24",
-        },
-        violet: {
-          DEFAULT: "#A78BFA",
-          hover: "#B9A4FF",
-          active: "#9065F7",
-          tint: "rgba(167, 139, 250, 0.12)",
-          border: "rgba(167, 139, 250, 0.3)",
-        },
-        // Core System Aliases mapped to Carbon & Electric Violet
         brand: {
-          midnight: "#0B0B10",
-          electric: "#A78BFA",
-          hover: "#B9A4FF",
-          cantaloupe: "#F59E0B",
-          violet: "#A78BFA",
+          midnight: "#02070A",
+          electric: "#0297DE",
+          cantaloupe: "#FC734D",
         },
         surface: {
-          canvas: "#121218",
-          deep: "#0B0B10",
-          raised: "#242430",
-          panel: "#242430",
-          elevated: "#30303D",
-          input: "#1A1A24",
+          canvas: "#02070A",
+          raised: "#071117",
+          panel: "#0A171E",
+          elevated: "#10212A",
+          input: "#08131A",
         },
         border: {
-          subtle: "#2A2A38",
-          strong: "#3E3E50",
-          focus: "#A78BFA",
+          subtle: "#172A34",
+          strong: "#29414D",
         },
         text: {
-          primary: "#EAEAF2",
-          secondary: "#858596",
-          muted: "#6B6B7E",
-          disabled: "#4B4B5A",
+          primary: "#E7F0F4",
+          secondary: "#9AAEB8",
+          muted: "#6F858F",
+          disabled: "#4B606A",
         },
         status: {
-          success: "#10B981",
-          warning: "#F59E0B",
-          error: "#EF4444",
-          info: "#38BDF8",
-          stale: "#F59E0B",
+          success: "#35A879",
+          warning: "#E4AD4C",
+          error: "#E05A5A",
+          info: "#0297DE",
+          stale: "#FC734D",
         },
       },
       fontFamily: {
@@ -68,3 +43,4 @@ export default {
   },
   plugins: [],
 };
+

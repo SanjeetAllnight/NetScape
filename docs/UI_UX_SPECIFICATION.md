@@ -4,7 +4,7 @@
 **Product:** NetScape — Smart Map-Based Network Infrastructure Planning Platform  
 **Specification type:** Text-only product design and implementation specification  
 **Target:** Desktop-first React + TypeScript application  
-**Design baseline:** Concept A — Integrated Engineering Workbench: Carbon `#121218`, Dark Slate `#242430`, Electric Violet `#A78BFA`, Soft White `#EAEAF2` (Superseding legacy prototype tokens)  
+**Design baseline:** Midnight Black `#02070A`, Electric Blue `#0297DE`, Cantaloupe Orange `#FC734D`  
 **Architecture authority:** `SYSTEM_ARCHITECTURE.md`, MVP architecture baseline v1.3  
 **Product brief:** `NetScape_Project_Plan_Updated.docx`
 
@@ -101,41 +101,61 @@ The UI should make this journey discoverable, but it must not force users throug
 
 # 2. Visual System
 
-## 2.1 Approved Visual Identity — Concept A: Integrated Engineering Workbench
+## 2.1 Locked brand colours
 
-The visual identity of NetScape embodies a focused, professional engineering environment: **Carbon & Electric Violet**. The aesthetic replaces low-contrast blue tones with deep, authoritative carbon surfaces, structured slate planes, and high-precision Electric Violet accents.
+These values are immutable. Do not alter their hex values, introduce alternate brand accents or substitute a different primary colour.
 
-### Core Palette Tokens
-
-| Token | CSS Variable | Hex | Role |
-|---|---|---|---|
-| `carbon-deep` | `--color-carbon-deep` | `#0B0B10` | Deepest canvas background, embedded diagram wells, and sunken panels. |
-| `carbon` | `--color-carbon` | `#121218` | Primary application and editor work surface background. |
-| `slate-dark` | `--color-slate-dark` | `#1A1A24` | Primary elevated surfaces: header bars, tab rails, tool rails, and cards. |
-| `slate-surface` | `--color-slate-surface` | `#242430` | Interactive panels, inspector bodies, modal containers, and inputs. |
-| `slate-elevated` | `--color-slate-elevated` | `#30303D` | Dropdowns, popovers, active card borders, and hover states. |
-| `slate-muted` | `--color-slate-muted` | `#858596` | Secondary labels, units, non-interactive metadata, and breadcrumbs. |
-| `violet` | `--color-violet` | `#A78BFA` | **Primary brand & interaction accent**: active nav, selected entities, primary buttons, focus rings. |
-| `violet-hover` | `--color-violet-hover` | `#B9A4FF` | Interactive hover state for violet actions and focus outlines. |
-| `violet-tint` | `--color-violet-tint` | `rgba(167, 139, 250, 0.12)` | Subtle selection background fills, active nav pills, and table row highlights. |
-
-### Semantic Colours
-
-Semantic colors convey analytical meaning and must never conflict with or mimic brand violet:
-
-| Token | Hex | Role / Meaning |
+| Token | Hex | Role |
 |---|---|---|
-| `status.success` | `#10B981` (Emerald) | Saved state, valid topology, reachable flows, 100% test passing, positive comparison delta. |
-| `status.warning` / `status.stale` | `#F59E0B` (Amber) | Validation warnings, near-capacity links, out-of-date analysis cache, offline status pill. |
-| `status.error` | `#EF4444` (Rose) | Storage write failures, validation errors, unreachable flows, calculation exceptions. |
-| `status.info` | `#38BDF8` (Sky Blue) | Informational badges, secondary comparison design B, active progress. |
+| `brand.midnight` | `#02070A` | Primary application background; deepest canvas and shell surface. |
+| `brand.electric` | `#0297DE` | Primary interaction accent: active navigation, focus, selected states, primary buttons and key links. |
+| `brand.cantaloupe` | `#FC734D` | Secondary accent for limited contextual emphasis, notable estimates and selected warnings/highlights. |
 
-### Contrast and Hierarchy Guidelines
+The three brand colours should not be used as full-bleed backgrounds for large panels. Electric Blue is an interaction signal, not a decoration. Cantaloupe Orange must remain secondary and should not compete with the primary action.
 
-- Dark Carbon surfaces (`#121218`) provide high contrast with Soft White primary text (`#EAEAF2`).
-- Violet (`#A78BFA`) delivers a 6.2:1 contrast ratio against Carbon backgrounds, exceeding WCAG AA requirements for normal text and graphical UI components.
-- Subdued hairline borders (`#2A2A38` subtle, `#3D3D4E` strong) delineate dense panels without heavy visual noise or ornamental drop shadows.
-- Map canvas features a dark CAD-style engineering grid (`radial-gradient(#2A2A38 1px, transparent 1px)`) when offline or before basemap tiles load.
+## 2.2 Supporting dark-neutral palette
+
+Build the hierarchy with dark blue-black neutrals. The following are recommended implementation tokens; only the three brand colours above are locked by the product brief.
+
+| Token | Suggested value | Usage |
+|---|---|---|
+| `surface.canvas` | `#02070A` | Main app background and map canvas fallback. |
+| `surface.raised` | `#071117` | Header, navigation rail and primary work panels. |
+| `surface.panel` | `#0A171E` | Inspector, tool palette, dock and page sections. |
+| `surface.elevated` | `#10212A` | Menus, popovers, selected table rows and compact dialogs. |
+| `surface.input` | `#08131A` | Text inputs, selects and editable table cells. |
+| `border.subtle` | `#172A34` | Internal separators and low-emphasis panel edges. |
+| `border.strong` | `#29414D` | Active panel boundaries, table header rules and input outlines. |
+| `text.primary` | `#E7F0F4` | Main text and high-priority values. |
+| `text.secondary` | `#9AAEB8` | Supporting labels, descriptions and metadata. |
+| `text.muted` | `#6F858F` | Timestamps, hints and non-interactive metadata. |
+| `text.disabled` | `#4B606A` | Disabled controls and unavailable actions. |
+
+Do not use pure white for all text or pure black as a secondary panel colour. The hierarchy should be visible through slight surface shifts and borders, not shadows or glow effects.
+
+## 2.3 Semantic colours
+
+Semantic colours are for meaning, not brand decoration. They must be accompanied by a text label, icon or shape distinction; never rely on colour alone.
+
+| Token | Suggested value | Meaning |
+|---|---|---|
+| `status.success` | `#35A879` | Saved, valid, reachable, completed. |
+| `status.warning` | `#E4AD4C` | Validation warning, near-limit condition, unverified assumption. |
+| `status.error` | `#E05A5A` | Failed save, blocking validation, unreachable flow, computation failure. |
+| `status.info` | `#0297DE` | Informational state and active progress. |
+| `status.stale` | `#FC734D` | Out-of-date derived result. Pair with the words “Out of date”; do not use orange alone. |
+
+For coverage, use a restrained five-class signal ramp with a persistent legend. Keep the class names and thresholds visible in the panel. The exact raster colours may use a muted teal/blue through amber/orange progression, but do not reuse the same hue for unrelated statuses. Dead-zone polygons or cells must remain distinguishable from obstacle geometry and selected devices.
+
+## 2.4 Colour application rules
+
+- The app shell and work panels remain dark neutral.
+- Primary buttons use Electric Blue for emphasis; destructive buttons use the semantic error colour and clear wording.
+- Active route, selected tool and keyboard focus use Electric Blue with a visible non-colour indicator such as a left border, outline or icon state.
+- Cantaloupe is reserved for important contextual emphasis and stale/estimate notices. Avoid using it on every icon or panel heading.
+- Semantic green, amber and red are restricted to their actual meanings.
+- Basemap tiles are external geographical content and may retain their normal map colours. Do not attempt to recolour the whole Leaflet basemap to match the application shell.
+- Check contrast for text and controls on every surface. Muted text must remain readable at normal viewing distance.
 
 ## 2.5 Typography
 
@@ -202,77 +222,77 @@ Use the routes defined by the approved architecture and its `createHashRouter` d
 
 Coverage is not a separate top-level route in the MVP. Its configuration, run state and results are presented in the map workspace's right-side dock, and its raster is rendered as an optional map overlay.
 
-## 3.3 Navigation Hierarchy & Workspace Grouping
+## 3.3 Navigation hierarchy
 
-NetScape groups project routes into four engineering stages that match the infrastructure planning lifecycle:
+**Global navigation**
 
-1. **DESIGN**
-   - **Map** (`.../map`): Geographical canvas, obstacle authoring, device placement, boundary management, connection drawing, and live RF signal overlay.
-   - **Topology** (`.../topology`): Pure logical network diagram (ReactFlow) showing device hierarchy, link types, ports, and parent relationships with layout persistence.
-   - **Split View**: Synchronized side-by-side view combining geographical map (left) and logical topology (right) with unified selection and viewport sync.
+- Projects
+- Device Catalog
+- Settings
 
-2. **PLAN**
-   - **Addressing** (`.../addressing`): IPv4 subnet requirements, CIDR validation, and deterministic VLSM address allocations.
-   - **Cost** (`.../cost`): CAPEX, annual OPEX, and multi-year TCO estimation with currency formatting (INR ₹) and interactive category breakdowns.
+**Project navigation**
 
-3. **ANALYSE**
-   - **Coverage** (Integrated dock in Map): Best-server RSSI calculation, 5-class RF raster visualization, dead-zone perimeter reporting, and log-distance parameters.
-   - **Simulation** (`.../simulation`): Simplified Dijkstra network reachability, bottleneck link analysis, latency modeling, and node/link failure scenario comparison.
+- Project overview / Designs
+- Current design selector
+- Map
+- Topology
+- Addressing
+- Cost
+- Simulation
+- Report
+- Compare designs
+- Project settings (opened from the project/design context menu)
 
-4. **DELIVER**
-   - **Compare** (`/projects/:projectId/compare`): Side-by-side structural diff, CAPEX/OPEX deltas, RF coverage comparison, and simulation trade-off analysis.
-   - **Report** (`.../report`): Comprehensive engineering document preview and client-side vector PDF generation with schematic figures and readiness checklists.
+The project navigation should be visible in the workspace as a narrow vertical rail or compact labelled navigation strip. Do not place every section in a large horizontal mega-menu.
 
-## 3.4 Persistent Context
+## 3.4 Persistent context
 
-Whenever the user is inside a project, the Workbench Header displays:
+Whenever the user is inside a project, display:
 
-- Project name breadcrumb.
-- Active design name and baseline status.
-- Design switcher and duplication action.
-- Autosave persistence state (`Saved`, `Saving…`, `Save error`).
-- Network connectivity state (`Online` / `Offline`).
-- Global command palette trigger (`Ctrl/Cmd + K`).
+- Project name.
+- Active design name.
+- Baseline status where applicable.
+- Current module/view.
+- Save state (`Saved`, `Saving…`, `Save failed`).
+- Online/offline state.
 
-The active project's design selector is one click away without returning to the projects list.
+The header must not display engineering statistics unrelated to the current task. The active project's design selector should be one click away without returning to the projects list.
 
 ---
 
-# 4. Workbench Shell Architecture
+# 4. Global Application Shell
 
-The Integrated Engineering Workbench shell provides a persistent, cohesive environment across all workspaces:
+## 4.1 Layout regions
 
-## 4.1 Two-Row Workbench Header (`WorkbenchHeader.tsx`)
-- **Top Row (Application Bar - 44px)**:
-  - NetScape brand icon and project breadcrumb.
-  - Active design selector dropdown with baseline indicator and one-click duplication.
-  - Centered Command Palette quick trigger (`Ctrl/Cmd + K`).
-  - Real-time persistence status (`Saved`, `Saving...`, `Save error`).
-  - Network connectivity badge (`Online` / `Offline`).
-  - Project Engineering Settings modal trigger.
-- **Bottom Row (Grouped Workspace Bar - 40px)**:
-  - Labeled workspace groups: DESIGN, PLAN, ANALYSE, DELIVER.
-  - High-visibility Electric Violet active indicators and hover states.
-  - Real-time stale status warning dots on Cost, Coverage, and Simulation when upstream design changes occur.
+The application shell is shared by global screens. The project workspace adds a denser editor layout.
 
-## 4.2 Bottom Analysis Status Strip (`AnalysisStatusStrip.tsx`)
-A persistent 36px bottom status bar rendered across design and analysis screens:
-- Real-time analysis status pills for Cost, Coverage, and Simulation (Current / Stale / Not Run / Running).
-- Intelligent, contextual "Next Action" recommendation (e.g. "Coverage stale — recalculate RF propagation", "Cost estimate not generated").
-- Expandable details drawer showing breakdown metrics, run timestamps, and direct calculation triggers.
+| Region | Desktop behaviour | Responsibility |
+|---|---|---|
+| Top header | 52–56 px high | Brand mark/name, current context, global actions, local/offline status. |
+| Global navigation | 216–240 px expanded, 56 px collapsed | Projects, Catalog and Settings navigation. |
+| Main content | Remaining width | Screen-specific page content. |
+| Toast layer | Fixed, non-blocking | Short confirmation or error feedback. |
+| Modal layer | Centred, bounded width | Creation, destructive confirmation and focused multi-field tasks. |
 
-## 4.3 Shared Workbench Inspector (`WorkbenchInspector.tsx`)
-A unified right-hand inspection drawer (320px) shared across Map and Topology:
-- Tabbed interface supporting **Device**, **Link**, and **Coverage** inspection.
-- Device inspection: Type, name, catalog item, position (Lat/Lng or Local X/Y), IP configuration, and connected links.
-- Link inspection: Medium (copper, fiber, wireless), endpoints, length, bandwidth capacity, and attenuation.
-- Coverage tab: Direct parameter tuning, calculation dispatch, and signal raster controls without modal popups.
+On the project workspace, use a compact 56 px global rail and dedicate more horizontal space to the work surface. The expanded global navigation is primarily for application-level screens.
 
-## 4.4 Command Palette (`CommandPalette.tsx`)
-- Accessible via keyboard shortcut `Ctrl+K` or `Cmd+K` anywhere in the application.
-- Quick navigation across all 8 workspace views.
-- Direct execution of common actions: Calculate Cost, Run Coverage, Open Settings, Load Demo Project, Export PDF.
-- Search filtering, keyboard arrow navigation, Enter selection, and Escape dismissal.
+## 4.2 Header contents
+
+Left to right:
+
+1. NetScape wordmark/icon.
+2. Breadcrumb or current context: Projects / Project name / Design name.
+3. Project/design selector when inside a project.
+4. Save state indicator.
+5. Online/offline indicator.
+6. Contextual overflow menu containing project settings, duplicate design, project list and non-primary actions.
+
+The header must not contain a manual Save button. Autosave is part of the persistence contract.
+
+## 4.3 Global status conventions
+
+- **Saved:** neutral/success icon plus label; show last-saved time in a tooltip or secondary text if useful.
+- **Saving…:** compact progress indicator. Do not disable unrelated UI while a normal commit is in progress.
 - **Save failed:** persistent visible error state until resolved; explain that the latest edit was not committed. The previous committed projection remains visible.
 - **Offline:** small header badge. It is informational, not a full-width alert unless the current action needs the network.
 - **Update available:** non-blocking banner with “Reload” action. Never force a reload during active editing or computation.

@@ -308,37 +308,21 @@ export function ComparisonView() {
   // Single Design Guard
   if (designs.length <= 1) {
     return (
-      <div className="flex-1 flex flex-col h-full bg-surface-canvas">
-        <div className="border-b border-border-subtle bg-surface-panel/80 px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <GitCompare className="w-5 h-5 text-violet" />
-            <h1 className="text-sm font-semibold text-text-primary">Design Comparison</h1>
-          </div>
-          {designs[0] && (
-            <Link
-              to={`/projects/${projectId}/designs/${designs[0].id}/map`}
-              className="px-3 py-1.5 rounded-lg border border-border-strong text-text-secondary hover:text-text-primary text-xs font-medium flex items-center gap-1.5"
-            >
-              Back to Design Workspace
-            </Link>
-          )}
+      <div className="flex-1 flex flex-col items-center justify-center bg-surface-canvas p-8 text-center">
+        <div className="w-12 h-12 rounded-xl bg-violet/10 text-violet flex items-center justify-center mb-4">
+          <GitCompare className="w-6 h-6" />
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <div className="w-12 h-12 rounded-xl bg-violet/10 text-violet flex items-center justify-center mb-4">
-            <GitCompare className="w-6 h-6" />
-          </div>
-          <h2 className="text-base font-semibold text-text-primary">Design Comparison Requires Multiple Designs</h2>
-          <p className="mt-2 text-xs text-text-muted max-w-md">
-            This project currently has only one design ({designs[0]?.name ?? "Baseline"}). To evaluate trade-offs in cost, RF coverage, and network simulation, duplicate the baseline to create an alternative design.
-          </p>
-          <button
-            onClick={handleDuplicateToCompare}
-            className="mt-6 px-4 py-2 rounded-lg bg-violet text-carbon-deep text-xs font-semibold hover:bg-violet-hover shadow-sm flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Duplicate Design to Compare
-          </button>
-        </div>
+        <h2 className="text-base font-semibold text-text-primary">Design Comparison Requires Multiple Designs</h2>
+        <p className="mt-2 text-xs text-text-muted max-w-md">
+          This project currently has only one design ({designs[0]?.name ?? "Baseline"}). To evaluate trade-offs in cost, RF coverage, and network simulation, duplicate the baseline to create an alternative design.
+        </p>
+        <button
+          onClick={handleDuplicateToCompare}
+          className="mt-6 px-4 py-2 rounded-lg bg-violet text-carbon-deep text-xs font-semibold hover:bg-violet-hover shadow-sm flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Duplicate Design to Compare
+        </button>
       </div>
     );
   }

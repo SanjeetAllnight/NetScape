@@ -3,27 +3,26 @@ import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive";
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg";
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", ...props }, ref) => {
     const base =
-      "inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet disabled:pointer-events-none disabled:opacity-40 rounded select-none";
+      "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-electric disabled:pointer-events-none disabled:opacity-50 rounded";
 
     const variants = {
-      primary: "bg-violet text-carbon-deep font-semibold hover:bg-violet-hover active:bg-violet-active shadow-sm",
-      secondary: "bg-surface-elevated text-text-primary hover:bg-slate-panel border border-border-subtle hover:border-border-strong",
-      outline: "border border-border-strong text-text-primary hover:bg-surface-elevated hover:border-border-strong",
-      ghost: "text-text-secondary hover:text-text-primary hover:bg-surface-elevated",
+      primary: "bg-brand-electric text-white hover:bg-brand-electric/90",
+      secondary: "bg-surface-elevated text-text-primary hover:bg-surface-elevated/80",
+      outline: "border border-border-strong text-text-primary hover:bg-surface-elevated",
+      ghost: "text-text-secondary hover:text-text-primary hover:bg-surface-panel",
       destructive: "bg-status-error text-white hover:bg-status-error/90",
     };
 
     const sizes = {
-      xs: "h-7 px-2.5 text-[11px] gap-1",
-      sm: "h-8 px-3 text-xs gap-1.5",
-      md: "h-9 px-4 text-xs gap-2",
-      lg: "h-10 px-5 text-sm gap-2",
+      sm: "h-8 px-3 text-xs",
+      md: "h-9 px-4 text-sm",
+      lg: "h-10 px-5 text-base",
     };
 
     return (
@@ -36,3 +35,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = "Button";
+

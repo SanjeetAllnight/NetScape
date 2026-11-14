@@ -17,7 +17,6 @@ import {
   Info,
 } from "lucide-react";
 import { ProjectHeader } from "@/features/shell/ProjectHeader";
-import { AnalysisStatusStrip } from "@/features/shell/AnalysisStatusStrip";
 import { useDesignStore } from "@/stores/designStore";
 import { getApplicationContainer } from "@/application/container";
 import type { DesignId, DeviceId, SubnetId, IPv4Cidr } from "@/contracts/primitives";
@@ -242,7 +241,7 @@ export function AddressingView() {
             <button
               onClick={handleAllocate}
               disabled={isAllocating || !currentParentCidr || subnets.length === 0}
-              className="px-4 py-1.5 rounded-lg bg-violet hover:bg-violet-hover active:bg-violet-active disabled:opacity-40 text-carbon-deep text-xs font-semibold shadow-md flex items-center gap-1.5 transition-colors select-none"
+              className="px-4 py-1.5 rounded bg-brand-electric hover:bg-brand-electric/90 disabled:opacity-50 text-white text-xs font-semibold shadow flex items-center gap-1.5 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               {isAllocating ? "Allocating..." : allocationStatus === "outOfDate" ? "Recalculate VLSM" : "Allocate Addresses"}
@@ -659,8 +658,6 @@ export function AddressingView() {
           </div>
         </div>
       </main>
-
-      <AnalysisStatusStrip />
     </div>
   );
 }

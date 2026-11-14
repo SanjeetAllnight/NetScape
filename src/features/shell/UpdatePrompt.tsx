@@ -50,10 +50,10 @@ export function UpdatePrompt() {
     <div
       role="alert"
       aria-live="polite"
-      className="fixed bottom-5 right-5 z-50 max-w-sm rounded-xl border border-violet/30 bg-surface-panel p-4 shadow-2xl backdrop-blur transition-all duration-200"
+      className="fixed bottom-5 right-5 z-50 max-w-sm rounded-lg border border-accent-blue/30 bg-surface-panel p-4 shadow-xl backdrop-blur transition-all duration-200"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet/15 text-violet">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-blue/15 text-accent-blue">
           <Sparkles className="h-4 w-4" />
         </div>
         <div className="flex-1">
@@ -66,14 +66,14 @@ export function UpdatePrompt() {
           <div className="mt-3 flex items-center gap-2">
             <button
               onClick={handleUpdate}
-              className="flex items-center gap-1.5 rounded-lg bg-violet px-3 py-1.5 text-xs font-semibold text-carbon-deep transition hover:bg-violet-hover shadow-md"
+              className="flex items-center gap-1.5 rounded bg-accent-blue px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-accent-blue-hover shadow-sm"
             >
               <RefreshCw className="h-3 w-3" />
               Update Now
             </button>
             <button
               onClick={handleLater}
-              className="rounded-lg bg-surface-raised px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-border-strong hover:text-text-primary transition"
+              className="rounded bg-surface-raised px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-border-strong hover:text-text-primary transition"
             >
               Later
             </button>
