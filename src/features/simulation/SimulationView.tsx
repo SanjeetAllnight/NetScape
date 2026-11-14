@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Activity,
@@ -14,6 +14,8 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
+import { WorkbenchHeader } from "@/features/shell/WorkbenchHeader";
+import { AnalysisStatusStrip } from "@/features/shell/AnalysisStatusStrip";
 import { useDesignStore } from "@/stores/designStore";
 import { useAnalysisStore } from "@/stores/analysisStore";
 import { getApplicationContainer } from "@/application/container";
@@ -36,6 +38,15 @@ import type { SimulationFlow, FailureScenario } from "@/contracts/domain";
 export function SimulationView() {
   const { designId } = useParams<{ designId: string }>();
   const aggregate = useDesignStore((s) => s.aggregate);
+
+  useEffect(() => {
+    if (!designId) return;
+    const container = getApplicationContainer();
+    if (aggregate?.design.id !== designId) {
+      container.designSession.open(designId as DesignId);
+    }
+    container.analysisCoordinator.inspect(designId as DesignId);
+  }, [designId, aggregate?.design.id]);
 
   const simulationRecord = useAnalysisStore(
     (s) => s.records.simulation as (Extract<AnalysisRecord, { type: "simulation" }>) | null
@@ -200,21 +211,20 @@ export function SimulationView() {
   }, [activeFlowResults, selectedFlowId]);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-surface-canvas overflow-hidden">
-      {/* Top Bar */}
-      <div className="h-14 border-b border-border-subtle bg-surface-panel/80 px-6 flex items-center justify-between">
+    <div className="flex-1 flex flex-col h-screen bg-surface-canvas overflow-hidden text-text-primary select-none">
+      <WorkbenchHeader />
+
+      {/* Sub-Header Bar */}
+      <div className="h-12 border-b border-border-subtle bg-surface-panel/80 px-4 sm:px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <Activity className="w-5 h-5 text-brand-electric" />
+          <Activity className="w-4 h-4 text-violet" />
           <div>
-            <h1 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-              Network Simulation
-              <span className="text-xs px-2 py-0.5 rounded bg-surface-raised border border-border-subtle font-mono text-text-secondary">
+            <h1 className="text-xs font-bold text-text-primary flex items-center gap-2">
+              Network Simulation &amp; SPF Routing
+              <span className="text-[10px] px-2 py-0.2 rounded bg-surface-raised border border-border-subtle font-mono text-text-secondary">
                 {aggregate?.design.name ?? "Design"}
               </span>
             </h1>
-            <p className="text-[11px] text-text-muted">
-              Undirected Dijkstra routing, hop latency, and failure scenario evaluation.
-            </p>
           </div>
         </div>
 
@@ -222,7 +232,7 @@ export function SimulationView() {
           {simulationStatus === "computing" ? (
             <button
               onClick={handleCancel}
-              className="px-3 py-1.5 rounded-lg border border-status-error/40 text-status-error text-xs font-medium hover:bg-status-error/10 flex items-center gap-1.5"
+              className="px-3 py-1 rounded-lg border border-status-error/40 text-status-error text-xs font-medium hover:bg-status-error/10 flex items-center gap-1.5"
             >
               <X className="w-3.5 h-3.5" />
               Cancel ({Math.round(simulationProgress * 100)}%)
@@ -230,7 +240,7 @@ export function SimulationView() {
           ) : (
             <button
               onClick={handleRun}
-              className="px-4 py-1.5 rounded-lg bg-brand-electric text-text-inverse text-xs font-semibold hover:bg-brand-electric/90 shadow-sm flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1 rounded-lg bg-violet text-carbon-deep text-xs font-semibold hover:bg-violet-hover shadow-md flex items-center gap-1.5 transition-colors"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               Run Simulation
@@ -239,20 +249,20 @@ export function SimulationView() {
 
           {/* Freshness Badge */}
           {simulationStatus === "fresh" && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded border border-[#10B981]/30">
+            <span className="inline-flex items-center gap-1 text-[11px] text-status-success bg-status-success/10 px-2 py-0.5 rounded border border-status-success/30 font-semibold font-mono">
               <CheckCircle2 className="w-3 h-3" />
-              Current
+              CURRENT
             </span>
           )}
           {simulationStatus === "stale" && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-0.5 rounded border border-[#F59E0B]/30">
+            <span className="inline-flex items-center gap-1 text-[11px] text-status-warning bg-status-warning/10 px-2 py-0.5 rounded border border-status-warning/30 font-semibold font-mono">
               <Clock className="w-3 h-3" />
-              Out of date
+              OUT OF DATE
             </span>
           )}
           {simulationStatus === "idle" && !result && (
-            <span className="text-[11px] text-text-muted bg-surface-raised px-2 py-0.5 rounded border border-border-subtle">
-              Not calculated
+            <span className="text-[11px] text-text-muted bg-surface-raised px-2 py-0.5 rounded border border-border-subtle font-mono">
+              UNCOMPUTED
             </span>
           )}
         </div>
@@ -925,6 +935,8 @@ export function SimulationView() {
           )}
         </div>
       </div>
+
+      <AnalysisStatusStrip />
     </div>
   );
 }
