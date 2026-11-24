@@ -711,6 +711,129 @@ describe("Phase 3 Analysis Modules & Design Comparison (Exit Gate 20 Scenarios)"
     expect(result.scenarios[0]?.flowResults[0]?.unreachableReason).toBe("noPath");
   });
 
+  it("Scenario 12b: Core switch failure changes reachability and missing servedByDeviceId is explicit", async () => {
+    const origin = makeGeoPoint(77.6, 12.9);
+    const { baselineDesignId } = await projectService.createProject({
+      name: "Core Failure Integration",
+      initialRegion: { label: "Lab", center: origin, bbox: null },
+    });
+
+    await session.open(baselineDesignId);
+
+    const switchItem = Object.values(useDesignStore.getState().aggregate!.catalogById).find(
+      (c) => c.type === "switch"
+    )!;
+    const serverItem = Object.values(useDesignStore.getState().aggregate!.catalogById).find(
+      (c) => c.type === "server"
+    )!;
+
+    await session.dispatch({
+      type: "device/add",
+      catalogItemId: switchItem.id,
+      position: makeGeoPoint(77.600, 12.900),
+      name: "Mechanical Switch",
+    });
+    await session.dispatch({
+      type: "device/add",
+      catalogItemId: switchItem.id,
+      position: makeGeoPoint(77.601, 12.900),
+      name: "Core Switch",
+    });
+    await session.dispatch({
+      type: "device/add",
+      catalogItemId: serverItem.id,
+      position: makeGeoPoint(77.602, 12.900),
+      name: "server 6",
+    });
+
+    const devices = Object.values(useDesignStore.getState().aggregate!.devicesById);
+    const mechSwitchId = devices.find((d) => d.name === "Mechanical Switch")!.id;
+    const coreSwitchId = devices.find((d) => d.name === "Core Switch")!.id;
+    const serverId = devices.find((d) => d.name === "server 6")!.id;
+
+    await session.dispatch({
+      type: "link/add",
+      sourceDeviceId: mechSwitchId,
+      targetDeviceId: coreSwitchId,
+      medium: "fiber",
+    });
+    await session.dispatch({
+      type: "link/add",
+      sourceDeviceId: coreSwitchId,
+      targetDeviceId: serverId,
+      medium: "fiber",
+    });
+
+    await session.dispatch({
+      type: "subnet/add",
+      name: "Mechanical Workshop",
+      hostsRequired: 10,
+      servedByDeviceId: mechSwitchId,
+    });
+    await session.dispatch({
+      type: "subnet/add",
+      name: "Unassigned Subnet",
+      hostsRequired: 10,
+      servedByDeviceId: null,
+    });
+
+    const subnets = Object.values(useDesignStore.getState().aggregate!.subnetsById);
+    const mechSubnetId = subnets.find((s) => s.name === "Mechanical Workshop")!.id;
+    const unassignedSubnetId = subnets.find((s) => s.name === "Unassigned Subnet")!.id;
+
+    await session.dispatch({
+      type: "simulation/setup",
+      setup: {
+        flows: [
+          {
+            id: "flow-mech" as never,
+            name: "Mechanical Workshop -> server 6",
+            sourceSubnetId: mechSubnetId,
+            destinationDeviceId: serverId,
+            demandMbpsOverride: 50,
+            enabled: true,
+          },
+          {
+            id: "flow-unassigned" as never,
+            name: "Unassigned Subnet -> server 6",
+            sourceSubnetId: unassignedSubnetId,
+            destinationDeviceId: serverId,
+            demandMbpsOverride: 50,
+            enabled: true,
+          },
+        ],
+        failureScenarios: [
+          {
+            id: "scen-core-fail" as never,
+            name: "Core Switch Failure",
+            failedDeviceIds: [coreSwitchId],
+            failedLinkIds: [],
+          },
+        ],
+      },
+    });
+
+    await coordinator.run("simulation", baselineDesignId);
+    const result = useAnalysisStore.getState().records.simulation!.result as SimulationResult;
+
+    const baseMech = result.baselineFlows.find((f) => f.flowId === "flow-mech")!;
+    expect(baseMech.reachable).toBe(true);
+    expect(baseMech.pathDeviceIds).toEqual([mechSwitchId, coreSwitchId, serverId]);
+    expect(baseMech.hopCount).toBe(2);
+
+    const baseUnassigned = result.baselineFlows.find((f) => f.flowId === "flow-unassigned")!;
+    expect(baseUnassigned.reachable).toBe(false);
+    expect(baseUnassigned.unreachableReason).toBe("missingServingDevice");
+    expect(baseUnassigned.pathDeviceIds).toEqual([]);
+
+    const coreFail = result.scenarios[0]!;
+    const failMech = coreFail.flowResults.find((f) => f.flowId === "flow-mech")!;
+    expect(failMech.reachable).toBe(false);
+    expect(failMech.unreachableReason).toBe("noPath");
+    expect(failMech.deliveredRateMbps).toBe(0);
+    expect(coreFail.metrics.reachableFlowCount).toBe(0);
+  });
+
   it("Scenario 13: Distinguish unreachable flows from reachable paths with missing capacity", async () => {
     // Calling simulation engine directly
     const { result: res } = await defaultSimulationEngine.run(

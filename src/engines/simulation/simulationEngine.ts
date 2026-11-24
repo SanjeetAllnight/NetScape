@@ -242,11 +242,37 @@ function runSingleSimulation(
   const routes: RouteInfo[] = [];
 
   for (const flow of flows) {
+    if (!flow.sourceDeviceId) {
+      routes.push({
+        flow,
+        reachable: false,
+        unreachableReason: "missingServingDevice",
+        pathNodes: [],
+        pathLinks: [],
+        hasMissingCapacity: false,
+        issues: [],
+      });
+      continue;
+    }
+
     if (failedDevices.has(flow.sourceDeviceId)) {
       routes.push({
         flow,
         reachable: false,
         unreachableReason: "sourceFailed",
+        pathNodes: [],
+        pathLinks: [],
+        hasMissingCapacity: false,
+        issues: [],
+      });
+      continue;
+    }
+
+    if (!activeNodes.has(flow.sourceDeviceId)) {
+      routes.push({
+        flow,
+        reachable: false,
+        unreachableReason: "missingServingDevice",
         pathNodes: [],
         pathLinks: [],
         hasMissingCapacity: false,

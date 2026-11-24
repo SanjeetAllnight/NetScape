@@ -298,6 +298,23 @@ describe("Domain Input Builders", () => {
     expect(simInput.edges).toHaveLength(1);
     expect(simInput.edges[0]?.lengthM).toBeGreaterThan(0);
     expect(simInput.flows).toHaveLength(1);
+    expect(simInput.flows[0]?.sourceDeviceId).toBe(devAp.id);
+  });
+
+  it("maps missing subnet servedByDeviceId to null rather than destinationDeviceId", () => {
+    const unmappedSubnet: Subnet = {
+      ...subnet,
+      servedByDeviceId: null,
+    };
+    const unmappedAggregate: DesignAggregate = {
+      ...aggregate,
+      subnetsById: { [unmappedSubnet.id]: unmappedSubnet },
+    };
+
+    const simInput = buildSimulationEngineInput(unmappedAggregate);
+    expect(simInput.flows).toHaveLength(1);
+    expect(simInput.flows[0]?.sourceDeviceId).toBeNull();
+    expect(simInput.flows[0]?.destinationDeviceId).toBe(devRt.id);
   });
 
   it("builds VlsmEngineInput with parent CIDR and subnets", () => {

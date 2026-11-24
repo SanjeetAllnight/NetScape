@@ -359,5 +359,158 @@ describe("Simulation Engine (P1-05)", () => {
       expect(sharedLink?.utilizationRatio).toBe(SIM_06_VECTOR.expected.linkUtilizationRatio);
       expect(sharedLink?.isCongested).toBe(true);
     });
+
+    it("explicitly marks flows with null sourceDeviceId as unreachable (missingServingDevice)", async () => {
+      const input: SimulationEngineInput = {
+        nodes: [
+          { deviceId: "sw_core" as DeviceId, type: "switch", processingDelayMs: 0.5 },
+          { deviceId: "srv_6" as DeviceId, type: "server", processingDelayMs: null },
+        ],
+        edges: [
+          {
+            linkId: "lnk_1" as LinkId,
+            sourceDeviceId: "sw_core" as DeviceId,
+            targetDeviceId: "srv_6" as DeviceId,
+            medium: "copper",
+            lengthM: 50,
+            capacityMbps: 1000,
+            routingWeight: 1,
+          },
+        ],
+        flows: [
+          {
+            flowId: "flw_unmapped" as FlowId,
+            subnetId: "sub_mech" as SubnetId,
+            sourceDeviceId: null,
+            destinationDeviceId: "srv_6" as DeviceId,
+            demandMbps: 50,
+          },
+        ],
+        scenarios: [],
+        settings: {
+          perHostDemandMbps: 5,
+          propagationSpeedMps: 200_000_000,
+          averagePacketSizeBytes: 1500,
+          processingDelayMsPerHop: 1,
+          queueingModel: "none",
+        },
+      };
+
+      const out = await simulate(input, dummyContext);
+      const flow = out.result.baselineFlows[0];
+      expect(flow?.reachable).toBe(false);
+      expect(flow?.unreachableReason).toBe("missingServingDevice");
+      expect(flow?.pathDeviceIds).toEqual([]);
+      expect(flow?.hopCount).toBe(0);
+      expect(flow?.deliveredRateMbps).toBe(0);
+      expect(flow?.latency).toBeNull();
+      expect(out.result.baselineMetrics.reachableFlowCount).toBe(0);
+      expect(out.result.baselineMetrics.unreachableFlowCount).toBe(1);
+    });
+
+    it("changes reachability and routing when disabling a core switch that a flow depends on", async () => {
+      const input: SimulationEngineInput = {
+        nodes: [
+          { deviceId: "sw_mech" as DeviceId, type: "switch", processingDelayMs: 0.5 },
+          { deviceId: "sw_core" as DeviceId, type: "switch", processingDelayMs: 0.5 },
+          { deviceId: "sw_backup" as DeviceId, type: "switch", processingDelayMs: 1.5 },
+          { deviceId: "srv_6" as DeviceId, type: "server", processingDelayMs: null },
+        ],
+        edges: [
+          {
+            linkId: "lnk_mech_core" as LinkId,
+            sourceDeviceId: "sw_mech" as DeviceId,
+            targetDeviceId: "sw_core" as DeviceId,
+            medium: "fiber",
+            lengthM: 100,
+            capacityMbps: 1000,
+            routingWeight: 1,
+          },
+          {
+            linkId: "lnk_core_srv" as LinkId,
+            sourceDeviceId: "sw_core" as DeviceId,
+            targetDeviceId: "srv_6" as DeviceId,
+            medium: "fiber",
+            lengthM: 50,
+            capacityMbps: 1000,
+            routingWeight: 1,
+          },
+          {
+            linkId: "lnk_mech_backup" as LinkId,
+            sourceDeviceId: "sw_mech" as DeviceId,
+            targetDeviceId: "sw_backup" as DeviceId,
+            medium: "copper",
+            lengthM: 150,
+            capacityMbps: 100,
+            routingWeight: 5,
+          },
+          {
+            linkId: "lnk_backup_srv" as LinkId,
+            sourceDeviceId: "sw_backup" as DeviceId,
+            targetDeviceId: "srv_6" as DeviceId,
+            medium: "copper",
+            lengthM: 150,
+            capacityMbps: 100,
+            routingWeight: 5,
+          },
+        ],
+        flows: [
+          {
+            flowId: "flw_mech" as FlowId,
+            subnetId: "sub_mech" as SubnetId,
+            sourceDeviceId: "sw_mech" as DeviceId,
+            destinationDeviceId: "srv_6" as DeviceId,
+            demandMbps: 50,
+          },
+        ],
+        scenarios: [
+          {
+            scenarioId: "scen_core_down" as never,
+            name: "Core Switch Failure",
+            failedDeviceIds: ["sw_core" as DeviceId],
+            failedLinkIds: [],
+          },
+          {
+            scenarioId: "scen_both_down" as never,
+            name: "Core + Backup Failure",
+            failedDeviceIds: ["sw_core" as DeviceId, "sw_backup" as DeviceId],
+            failedLinkIds: [],
+          },
+        ],
+        settings: {
+          perHostDemandMbps: 5,
+          propagationSpeedMps: 200_000_000,
+          averagePacketSizeBytes: 1500,
+          processingDelayMsPerHop: 1,
+          queueingModel: "none",
+        },
+      };
+
+      const out = await simulate(input, dummyContext);
+
+      // Baseline routes via sw_core
+      const baseFlow = out.result.baselineFlows[0]!;
+      expect(baseFlow.reachable).toBe(true);
+      expect(baseFlow.pathDeviceIds).toEqual(["sw_mech", "sw_core", "srv_6"]);
+      expect(baseFlow.hopCount).toBe(2);
+      expect(baseFlow.bottleneckCapacityMbps).toBe(1000);
+
+      // Core Switch Failure reroutes via sw_backup with higher latency and lower bottleneck
+      const coreFail = out.result.scenarios[0]!;
+      const coreFailFlow = coreFail.flowResults[0]!;
+      expect(coreFailFlow.reachable).toBe(true);
+      expect(coreFailFlow.pathDeviceIds).toEqual(["sw_mech", "sw_backup", "srv_6"]);
+      expect(coreFailFlow.bottleneckCapacityMbps).toBe(100);
+      expect(coreFailFlow.latency!.totalMs).toBeGreaterThan(baseFlow.latency!.totalMs);
+
+      // Core + Backup Failure makes flow unreachable
+      const bothFail = out.result.scenarios[1]!;
+      const bothFailFlow = bothFail.flowResults[0]!;
+      expect(bothFailFlow.reachable).toBe(false);
+      expect(bothFailFlow.unreachableReason).toBe("noPath");
+      expect(bothFailFlow.deliveredRateMbps).toBe(0);
+      expect(bothFail.metrics.reachableFlowCount).toBe(0);
+      expect(bothFail.metrics.unreachableFlowCount).toBe(1);
+    });
   });
 });
