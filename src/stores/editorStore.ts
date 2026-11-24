@@ -90,10 +90,11 @@ export const useEditorStore = create<EditorStoreState>((set) => ({
     })),
 
   setActiveTool: (activeTool) =>
-    set({
+    set((state) => ({
       activeTool,
-      linkDraft: activeTool === "connect-link" ? undefined : null,
-    }),
+      catalogItemIdToPlace: activeTool === "place-device" ? state.catalogItemIdToPlace : null,
+      linkDraft: activeTool === "connect-link" ? state.linkDraft : null,
+    })),
 
   setCatalogItemIdToPlace: (catalogItemIdToPlace) =>
     set({
