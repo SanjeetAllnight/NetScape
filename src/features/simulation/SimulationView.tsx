@@ -369,6 +369,7 @@ export function SimulationView() {
                         {subnets.map((sub) => (
                           <option key={sub.id} value={sub.id}>
                             {sub.name} ({sub.hostsRequired} hosts)
+                            {sub.servedByDeviceId ? "" : " — No serving device"}
                           </option>
                         ))}
                       </select>
@@ -783,7 +784,11 @@ export function SimulationView() {
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#EF4444] bg-[#EF4444]/10 px-1.5 py-0.5 rounded border border-[#EF4444]/30">
-                                  Unreachable ({fr.unreachableReason ?? "no path"})
+                                  Unreachable (
+                                  {fr.unreachableReason === "missingServingDevice"
+                                    ? "no serving device"
+                                    : fr.unreachableReason ?? "no path"}
+                                  )
                                 </span>
                               )}
                             </td>
@@ -832,7 +837,11 @@ export function SimulationView() {
                     <span className="text-[#10B981] font-semibold">Reachable</span>
                   ) : (
                     <span className="text-[#EF4444] font-semibold">
-                      Unreachable ({activeSelectedFlow.unreachableReason ?? "noPath"})
+                      Unreachable (
+                      {activeSelectedFlow.unreachableReason === "missingServingDevice"
+                        ? "no serving device"
+                        : activeSelectedFlow.unreachableReason ?? "noPath"}
+                      )
                     </span>
                   )}
                 </div>

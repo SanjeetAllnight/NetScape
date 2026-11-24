@@ -283,7 +283,11 @@ export interface LinkUtilization {
   isCongested: boolean;
 }
 
-export type SimulationUnreachableReason = "sourceFailed" | "destinationFailed" | "noPath";
+export type SimulationUnreachableReason =
+  | "sourceFailed"
+  | "destinationFailed"
+  | "noPath"
+  | "missingServingDevice";
 export type SimulationThroughputCompleteness = "complete" | "missingCapacity" | "notApplicable";
 
 export interface SimulationIssue {
@@ -295,7 +299,7 @@ export interface SimulationIssue {
 export interface SimulationFlowResult {
   flowId: FlowId;
   sourceSubnetId: SubnetId;
-  sourceDeviceId: DeviceId;
+  sourceDeviceId: DeviceId | null;
   destinationDeviceId: DeviceId;
   reachable: boolean; // graph reachability only; independent of capacity completeness
   unreachableReason: SimulationUnreachableReason | null;
@@ -397,7 +401,7 @@ export interface SimulationEdgeInput {
 export interface SimulationFlowInput {
   flowId: FlowId;
   subnetId: SubnetId;
-  sourceDeviceId: DeviceId;
+  sourceDeviceId: DeviceId | null;
   destinationDeviceId: DeviceId;
   demandMbps: number; // finite and > 0
 }

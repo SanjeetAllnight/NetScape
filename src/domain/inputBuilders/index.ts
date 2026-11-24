@@ -143,22 +143,27 @@ export function buildSimulationEngineInput(aggregate: DesignAggregate): Simulati
     };
   });
 
-  let flows: SimulationFlowInput[] = aggregate.design.simulationSetup.flows.map((f) => {
-    const sub = aggregate.subnetsById[f.sourceSubnetId];
-    const sourceDevId = sub?.servedByDeviceId ?? f.destinationDeviceId;
-    const demand =
-      f.demandMbpsOverride ??
-      aggregate.project.settings.simulation.perHostDemandMbps * (sub?.hostsRequired || 1);
-    return {
-      flowId: f.id,
-      subnetId: f.sourceSubnetId,
-      sourceDeviceId: sourceDevId,
-      destinationDeviceId: f.destinationDeviceId,
-      demandMbps: demand,
-    };
-  });
+  let flows: SimulationFlowInput[] = aggregate.design.simulationSetup.flows
+    .filter((f) => f.enabled)
+    .map((f) => {
+      const sub = aggregate.subnetsById[f.sourceSubnetId];
+      const sourceDevId =
+        sub?.servedByDeviceId && aggregate.devicesById[sub.servedByDeviceId]
+          ? sub.servedByDeviceId
+          : null;
+      const demand =
+        f.demandMbpsOverride ??
+        aggregate.project.settings.simulation.perHostDemandMbps * (sub?.hostsRequired || 1);
+      return {
+        flowId: f.id,
+        subnetId: f.sourceSubnetId,
+        sourceDeviceId: sourceDevId,
+        destinationDeviceId: f.destinationDeviceId,
+        demandMbps: demand,
+      };
+    });
 
-  if (flows.length === 0) {
+  if (aggregate.design.simulationSetup.flows.length === 0) {
     const servers = Object.values(aggregate.devicesById).filter((d) => d.type === "server");
     if (servers.length > 0) {
       const derived: SimulationFlowInput[] = [];

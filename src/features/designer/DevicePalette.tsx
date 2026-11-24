@@ -63,9 +63,8 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
 
   return (
     <div
-      className={`absolute top-4 left-4 z-[400] flex flex-col bg-surface-raised/95 backdrop-blur-md rounded-xl border border-border-strong shadow-2xl text-xs select-none transition-all duration-150 ${
-        isExpanded ? "w-44 p-2 gap-1" : "w-11 p-1.5 gap-1.5 items-center"
-      }`}
+      className={`absolute top-4 left-4 z-[400] flex flex-col bg-surface-raised/95 backdrop-blur-md rounded-xl border border-border-strong shadow-2xl text-xs select-none transition-all duration-150 ${isExpanded ? "w-44 p-2 gap-1" : "w-11 p-1.5 gap-1.5 items-center"
+        }`}
       aria-label="Authoring Tool Rail"
     >
       {/* Expand / Collapse Header */}
@@ -88,15 +87,12 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => {
           setActiveTool("select");
-          setCatalogItemIdToPlace(null);
-          setLinkDraft(null);
         }}
         title="Select & Move (V)"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
-          activeTool === "select"
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${activeTool === "select"
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <MousePointer className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Select / Move</span>}
@@ -108,11 +104,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => handleSelectDevice("router")}
         title="Place Router"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${
-          activeTool === "place-device" && catalogItemIdToPlace === itemsByType.router
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${activeTool === "place-device" && catalogItemIdToPlace === itemsByType.router
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Router className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Router</span>}
@@ -121,11 +116,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => handleSelectDevice("switch")}
         title="Place Switch"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${
-          activeTool === "place-device" && catalogItemIdToPlace === itemsByType.switch
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${activeTool === "place-device" && catalogItemIdToPlace === itemsByType.switch
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Network className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Switch</span>}
@@ -134,11 +128,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => handleSelectDevice("accessPoint")}
         title="Place Wi-Fi Access Point"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${
-          activeTool === "place-device" && catalogItemIdToPlace === itemsByType.accessPoint
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${activeTool === "place-device" && catalogItemIdToPlace === itemsByType.accessPoint
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Wifi className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Access Point</span>}
@@ -147,11 +140,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => handleSelectDevice("server")}
         title="Place Server"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${
-          activeTool === "place-device" && catalogItemIdToPlace === itemsByType.server
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors relative ${activeTool === "place-device" && catalogItemIdToPlace === itemsByType.server
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Server className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Server</span>}
@@ -163,11 +155,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <button
         onClick={() => handleSelectConnect("copper")}
         title="Connect Devices (Two-click link)"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
-          activeTool === "connect-link"
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${activeTool === "connect-link"
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Waypoints className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Connect Link</span>}
@@ -178,16 +169,13 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       {/* Draw Planning Boundary */}
       <button
         onClick={() => {
-          setActiveTool("draw-boundary");
-          setCatalogItemIdToPlace(null);
-          setLinkDraft(null);
+          setActiveTool(activeTool === "draw-boundary" ? "select" : "draw-boundary");
         }}
         title="Draw Planning Boundary (Geoman)"
-        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
-          activeTool === "draw-boundary"
+        className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${activeTool === "draw-boundary"
             ? "bg-violet text-carbon-deep font-semibold shadow-sm"
             : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-        }`}
+          }`}
       >
         <Shield className="w-4 h-4 shrink-0" />
         {isExpanded && <span>Boundary</span>}
@@ -197,16 +185,13 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
       <div className="relative group w-full">
         <button
           onClick={() => {
-            setActiveTool("draw-obstacle");
-            setCatalogItemIdToPlace(null);
-            setLinkDraft(null);
+            setActiveTool(activeTool === "draw-obstacle" ? "select" : "draw-obstacle");
           }}
           title="Draw Manual Obstacle Polygon"
-          className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
-            activeTool === "draw-obstacle"
+          className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${activeTool === "draw-obstacle"
               ? "bg-violet text-carbon-deep font-semibold shadow-sm"
               : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-          }`}
+            }`}
         >
           <div className="w-4 h-4 rounded border border-current flex items-center justify-center text-[10px] font-bold shrink-0">
             O
@@ -224,11 +209,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
               <button
                 key={mat}
                 onClick={() => setObstacleMaterialToPlace(mat)}
-                className={`px-2 py-1 rounded text-[11px] text-left capitalize transition-colors ${
-                  obstacleMaterialToPlace === mat
+                className={`px-2 py-1 rounded text-[11px] text-left capitalize transition-colors ${obstacleMaterialToPlace === mat
                     ? "bg-violet text-carbon-deep font-semibold"
                     : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
-                }`}
+                  }`}
               >
                 {mat}
               </button>
@@ -244,11 +228,10 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
           <button
             onClick={onOpenTemplates}
             title="Apply Star / Tree Template"
-            className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
-              isExpanded
+            className={`w-full p-2 rounded-lg flex items-center gap-2.5 transition-colors ${isExpanded
                 ? "text-text-secondary hover:text-violet hover:bg-surface-elevated"
                 : "text-violet hover:bg-surface-elevated justify-center"
-            }`}
+              }`}
           >
             <Sparkles className="w-4 h-4 text-violet shrink-0" />
             {isExpanded && <span>Templates</span>}
@@ -263,6 +246,34 @@ export function DevicePalette({ onOpenTemplates }: DevicePaletteProps) {
           {linkDraft?.sourceDeviceId
             ? "Click target device to connect"
             : "Click source device"}
+        </div>
+      )}
+
+      {/* Polygon Drawing Status & Controls */}
+      {(activeTool === "draw-boundary" || activeTool === "draw-obstacle") && (
+        <div className="absolute left-full ml-3 top-20 bg-surface-raised border border-border-strong shadow-2xl px-3 py-1.5 rounded-lg text-[11px] whitespace-nowrap text-text-primary flex items-center gap-2 z-50">
+          <span className="w-2 h-2 rounded-full bg-violet animate-pulse" />
+          <span>
+            {activeTool === "draw-boundary"
+              ? "Click points to draw boundary"
+              : "Click points to draw obstacle"}
+          </span>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("netscape:finish-draw"))}
+            className="px-2 py-0.5 rounded bg-violet text-carbon-deep font-semibold hover:bg-violet/90 transition-colors"
+            title="Finish polygon (or click first point / press Enter)"
+          >
+            Finish
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTool("select")}
+            className="px-2 py-0.5 rounded bg-surface-elevated text-text-secondary hover:text-text-primary border border-border-subtle transition-colors"
+            title="Cancel drawing (Esc)"
+          >
+            Cancel
+          </button>
         </div>
       )}
     </div>

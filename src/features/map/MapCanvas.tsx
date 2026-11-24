@@ -170,6 +170,14 @@ export function MapCanvas() {
         snappable: true,
         snapDistance: 15,
         allowSelfIntersection: false,
+        finishOnEnter: true,
+        exitModeOnEscape: true,
+      });
+
+      map.on("pm:drawend", () => {
+        if (activeToolRef.current === "draw-boundary" || activeToolRef.current === "draw-obstacle") {
+          useEditorStore.getState().setActiveTool("select");
+        }
       });
 
       // On Geoman Polygon Creation: PURGE TEMPORARY LAYER IMMEDIATELY
@@ -222,9 +230,17 @@ export function MapCanvas() {
       });
     }
 
+    const handleFinishDraw = () => {
+      if (map.pm) {
+        (map.pm as unknown as { finishDraw?: () => boolean }).finishDraw?.();
+      }
+    };
+    window.addEventListener("netscape:finish-draw", handleFinishDraw);
+
     mapInstanceRef.current = map;
 
     return () => {
+      window.removeEventListener("netscape:finish-draw", handleFinishDraw);
       map.remove();
       mapInstanceRef.current = null;
     };
